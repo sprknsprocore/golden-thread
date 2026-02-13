@@ -1,26 +1,190 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "../styles/figma-tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── shadcn base tokens ── */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* ── Figma token → Tailwind color utilities ──
+     Usage: bg-figma-bg-depth1, text-figma-text-secondary, etc. */
+
+  /* Backgrounds */
+  --color-figma-bg-default: var(--figma-bg-default);
+  --color-figma-bg-depth1: var(--figma-bg-depth1);
+  --color-figma-bg-depth2: var(--figma-bg-depth2);
+  --color-figma-bg-nav: var(--figma-bg-nav);
+
+  /* Primary – Procore Orange */
+  --color-figma-orange: var(--figma-primary-orange);
+  --color-figma-orange-hover: var(--figma-primary-orange-hover);
+  --color-figma-brand: var(--figma-brand);
+
+  /* CTA tiers */
+  --color-figma-cta-p1-bg: var(--figma-cta-p1-bg);
+  --color-figma-cta-p1-text: var(--figma-cta-p1-text);
+  --color-figma-cta-p2-bg: var(--figma-cta-p2-bg);
+  --color-figma-cta-p2-text: var(--figma-cta-p2-text);
+  --color-figma-cta-p3-text: var(--figma-cta-p3-text);
+
+  /* Chart colors */
+  --color-figma-chart-1: var(--figma-chart-1);
+  --color-figma-chart-2: var(--figma-chart-2);
+  --color-figma-chart-3: var(--figma-chart-3);
+  --color-figma-chart-muted: var(--figma-chart-muted);
+  --color-figma-chart-exception: var(--figma-chart-exception);
+
+  /* Primary – Teal/Sage */
+  --color-figma-teal: var(--figma-primary-main);
+  --color-figma-teal-dark: var(--figma-primary-dark);
+  --color-figma-stone: var(--figma-primary-stone);
+
+  /* Text */
+  --color-figma-text-primary: var(--figma-text-primary);
+  --color-figma-text-secondary: var(--figma-text-secondary);
+  --color-figma-text-tertiary: var(--figma-text-tertiary);
+  --color-figma-text-disabled: var(--figma-text-disabled);
+
+  /* Semantic */
+  --color-figma-success: var(--figma-success);
+  --color-figma-success-light: var(--figma-success-light);
+  --color-figma-error: var(--figma-error);
+  --color-figma-error-light: var(--figma-error-light);
+  --color-figma-info: var(--figma-info);
+  --color-figma-info-light: var(--figma-info-light);
+
+  /* Status */
+  --color-figma-status-available: var(--figma-status-available);
+  --color-figma-status-active: var(--figma-status-active);
+  --color-figma-status-unavailable: var(--figma-status-unavailable);
+
+  /* Top bar / Nav */
+  --color-figma-topbar-bg: var(--figma-topbar-bg);
+  --color-figma-topbar-text: var(--figma-topbar-text);
+  --color-figma-topbar-text-muted: var(--figma-topbar-text-muted);
+
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Light theme: remap shadcn tokens to Figma / Helix palette ── */
+:root {
+  --radius: 0.5rem;
+  --background: var(--figma-bg-default);
+  --foreground: var(--figma-text-primary);
+  --card: var(--figma-bg-default);
+  --card-foreground: var(--figma-text-primary);
+  --popover: var(--figma-bg-default);
+  --popover-foreground: var(--figma-text-primary);
+  --primary: var(--figma-primary-orange);
+  --primary-foreground: #ffffff;
+  --secondary: var(--figma-bg-depth1);
+  --secondary-foreground: var(--figma-text-primary);
+  --muted: var(--figma-bg-depth2);
+  --muted-foreground: var(--figma-text-secondary);
+  --accent: var(--figma-primary-selected);
+  --accent-foreground: var(--figma-primary-dark);
+  --destructive: var(--figma-error);
+  --border: var(--figma-bg-outline);
+  --input: var(--figma-bg-outline);
+  --ring: var(--figma-primary-main);
+  /* Charts – Figma slate family */
+  --chart-1: var(--figma-chart-1);
+  --chart-2: var(--figma-chart-2);
+  --chart-3: var(--figma-chart-3);
+  --chart-4: var(--figma-chart-muted);
+  --chart-5: var(--figma-chart-exception);
+  /* Sidebar – Figma nav */
+  --sidebar: var(--figma-bg-depth1);
+  --sidebar-foreground: var(--figma-text-primary);
+  --sidebar-primary: var(--figma-primary-main);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--figma-primary-selected);
+  --sidebar-accent-foreground: var(--figma-primary-dark);
+  --sidebar-border: var(--figma-bg-outline);
+  --sidebar-ring: var(--figma-primary-focused);
+}
+
+/* ── Dark theme ── */
+.dark {
+  --background: #1a1a1a;
+  --foreground: #f5f5f5;
+  --card: #242424;
+  --card-foreground: #f5f5f5;
+  --popover: #242424;
+  --popover-foreground: #f5f5f5;
+  --primary: var(--figma-primary-orange);
+  --primary-foreground: #ffffff;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #e5e5e5;
+  --muted: #2a2a2a;
+  --muted-foreground: #a3a3a3;
+  --accent: #333333;
+  --accent-foreground: #e5e5e5;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: var(--figma-primary-main);
+  --chart-1: #94a3b8;
+  --chart-2: #64748b;
+  --chart-3: #475569;
+  --chart-4: #cbd5e1;
+  --chart-5: #f59e0b;
+  --sidebar: #1e1e1e;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: var(--figma-primary-main);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #333333;
+  --sidebar-accent-foreground: #e5e5e5;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--figma-primary-focused);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
 }

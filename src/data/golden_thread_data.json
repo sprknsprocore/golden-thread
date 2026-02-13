@@ -1,0 +1,128 @@
+{
+  "project_metadata": {
+    "name": "Western Boone High School Tennis",
+    "status": "Active",
+    "location": "Western Boone, IN"
+  },
+  "claiming_schema_library": {
+    "storm_pipe_standard": {
+      "id": "cs_001",
+      "name": "Standard RCP Storm Pipe Installation",
+      "steps": [
+        { "name": "Clean Rock Base", "weight": 0.20 },
+        { "name": "Lay Pipe", "weight": 0.40 },
+        { "name": "Fittings & Alignment", "weight": 0.30 },
+        { "name": "Backfill & Initial Test", "weight": 0.10 }
+      ]
+    },
+    "slab_on_grade": {
+      "id": "cs_002",
+      "name": "Concrete Slab on Grade",
+      "steps": [
+        { "name": "Excavation/Subgrade", "weight": 0.40 },
+        { "name": "Formwork & Rebar", "weight": 0.30 },
+        { "name": "Pour & Finish", "weight": 0.30 }
+      ]
+    }
+  },
+  "active_assemblies": [
+    {
+      "wbs_code": "02-750.steel.z-loop",
+      "description": "12-inch RCP Storm Pipe",
+      "budgeted_qty": 580,
+      "uom": "LF",
+      "budgeted_hours": 80,
+      "claiming_schema_id": "cs_001",
+      "blended_unit_cost": 50.61,
+      "crew_template": [
+        { "role": "Pipe Layer", "count": 2 },
+        { "role": "Operator", "count": 1 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "RCP Pipe 12\"", "qty_required": 580, "uom": "LF" },
+        { "item": "Clean Stone Base", "qty_required": 189, "uom": "TON" }
+      ]
+    },
+    {
+      "wbs_code": "02-750.steel.z-loop-30",
+      "description": "30-inch RCP Storm Pipe",
+      "budgeted_qty": 360,
+      "uom": "LF",
+      "budgeted_hours": 120,
+      "claiming_schema_id": "cs_001",
+      "blended_unit_cost": 141.52,
+      "crew_template": [
+        { "role": "Pipe Layer", "count": 3 },
+        { "role": "Operator", "count": 1 },
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": [
+        { "item": "RCP Pipe 30\"", "qty_required": 360, "uom": "LF" }
+      ]
+    },
+    {
+      "wbs_code": "03-310.TL",
+      "description": "Form Walls - Area TLL",
+      "budgeted_qty": 6510,
+      "uom": "SF",
+      "budgeted_hours": 400,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 45.00,
+      "crew_template": [
+        { "role": "Carpenter", "count": 3 },
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": []
+    }
+  ],
+  "provisional_wbs_codes": [
+    "02-750.steel.z-loop",
+    "02-750.steel.z-loop-30",
+    "03-310.TL"
+  ],
+  "mock_inventory": [
+    { "item": "RCP Pipe 12\"", "on_hand": 1000, "uom": "LF" },
+    { "item": "RCP Pipe 30\"", "on_hand": 500, "uom": "LF" },
+    { "item": "Clean Stone Base", "on_hand": 300, "uom": "TON" },
+    { "item": "Standard Cribs", "on_hand": 200, "uom": "EA" }
+  ],
+  "workers": [
+    { "id": "w_001", "name": "Mike Torres", "role": "Pipe Layer", "hourly_rate": 42.00 },
+    { "id": "w_002", "name": "James Kowalski", "role": "Pipe Layer", "hourly_rate": 42.00 },
+    { "id": "w_003", "name": "Carlos Ruiz", "role": "Operator", "hourly_rate": 55.00 },
+    { "id": "w_004", "name": "Dave Hensley", "role": "Laborer", "hourly_rate": 32.00 },
+    { "id": "w_005", "name": "Brandon Cole", "role": "Laborer", "hourly_rate": 32.00 },
+    { "id": "w_006", "name": "Trent Marshall", "role": "Carpenter", "hourly_rate": 48.00 },
+    { "id": "w_007", "name": "Alejandro Vega", "role": "Carpenter", "hourly_rate": 48.00 },
+    { "id": "w_008", "name": "Sam Patel", "role": "Pipe Layer", "hourly_rate": 42.00 }
+  ],
+  "kiosk_entries": [
+    { "id": "k_001", "worker_id": "w_001", "date": "2026-02-10", "clock_in": "2026-02-10T06:58:00", "clock_out": "2026-02-10T15:32:00", "total_hours": 8.5 },
+    { "id": "k_002", "worker_id": "w_002", "date": "2026-02-10", "clock_in": "2026-02-10T07:02:00", "clock_out": "2026-02-10T15:30:00", "total_hours": 8.5 },
+    { "id": "k_003", "worker_id": "w_003", "date": "2026-02-10", "clock_in": "2026-02-10T06:45:00", "clock_out": "2026-02-10T15:45:00", "total_hours": 9.0 },
+    { "id": "k_004", "worker_id": "w_004", "date": "2026-02-10", "clock_in": "2026-02-10T07:00:00", "clock_out": "2026-02-10T15:30:00", "total_hours": 8.5 },
+    { "id": "k_005", "worker_id": "w_005", "date": "2026-02-10", "clock_in": "2026-02-10T07:05:00", "clock_out": "2026-02-10T15:35:00", "total_hours": 8.5 },
+    { "id": "k_006", "worker_id": "w_006", "date": "2026-02-10", "clock_in": "2026-02-10T06:55:00", "clock_out": "2026-02-10T15:25:00", "total_hours": 8.5 },
+    { "id": "k_007", "worker_id": "w_007", "date": "2026-02-10", "clock_in": "2026-02-10T07:00:00", "clock_out": "2026-02-10T15:30:00", "total_hours": 8.5 },
+    { "id": "k_008", "worker_id": "w_008", "date": "2026-02-10", "clock_in": "2026-02-10T07:10:00", "clock_out": "2026-02-10T15:40:00", "total_hours": 8.5 },
+
+    { "id": "k_009", "worker_id": "w_001", "date": "2026-02-11", "clock_in": "2026-02-11T07:00:00", "clock_out": "2026-02-11T15:30:00", "total_hours": 8.5 },
+    { "id": "k_010", "worker_id": "w_002", "date": "2026-02-11", "clock_in": "2026-02-11T06:55:00", "clock_out": "2026-02-11T15:25:00", "total_hours": 8.5 },
+    { "id": "k_011", "worker_id": "w_003", "date": "2026-02-11", "clock_in": "2026-02-11T06:50:00", "clock_out": "2026-02-11T15:50:00", "total_hours": 9.0 },
+    { "id": "k_012", "worker_id": "w_004", "date": "2026-02-11", "clock_in": "2026-02-11T07:00:00", "clock_out": "2026-02-11T15:30:00", "total_hours": 8.5 },
+    { "id": "k_013", "worker_id": "w_005", "date": "2026-02-11", "clock_in": "2026-02-11T07:00:00", "clock_out": "2026-02-11T15:00:00", "total_hours": 8.0 },
+    { "id": "k_014", "worker_id": "w_006", "date": "2026-02-11", "clock_in": "2026-02-11T07:05:00", "clock_out": "2026-02-11T15:35:00", "total_hours": 8.5 },
+    { "id": "k_015", "worker_id": "w_007", "date": "2026-02-11", "clock_in": "2026-02-11T07:00:00", "clock_out": "2026-02-11T15:30:00", "total_hours": 8.5 },
+    { "id": "k_016", "worker_id": "w_008", "date": "2026-02-11", "clock_in": "2026-02-11T07:15:00", "clock_out": "2026-02-11T15:15:00", "total_hours": 8.0 },
+
+    { "id": "k_017", "worker_id": "w_001", "date": "2026-02-12", "clock_in": "2026-02-12T07:00:00", "clock_out": "2026-02-12T15:30:00", "total_hours": 8.5 },
+    { "id": "k_018", "worker_id": "w_002", "date": "2026-02-12", "clock_in": "2026-02-12T07:00:00", "clock_out": "2026-02-12T15:30:00", "total_hours": 8.5 },
+    { "id": "k_019", "worker_id": "w_003", "date": "2026-02-12", "clock_in": "2026-02-12T06:50:00", "clock_out": "2026-02-12T15:50:00", "total_hours": 9.0 },
+    { "id": "k_020", "worker_id": "w_004", "date": "2026-02-12", "clock_in": "2026-02-12T07:00:00", "clock_out": "2026-02-12T15:30:00", "total_hours": 8.5 },
+    { "id": "k_021", "worker_id": "w_005", "date": "2026-02-12", "clock_in": "2026-02-12T07:10:00", "clock_out": "2026-02-12T15:40:00", "total_hours": 8.5 },
+    { "id": "k_022", "worker_id": "w_006", "date": "2026-02-12", "clock_in": "2026-02-12T07:00:00", "clock_out": "2026-02-12T15:30:00", "total_hours": 8.5 },
+    { "id": "k_023", "worker_id": "w_007", "date": "2026-02-12", "clock_in": "2026-02-12T06:55:00", "clock_out": "2026-02-12T15:25:00", "total_hours": 8.5 },
+    { "id": "k_024", "worker_id": "w_008", "date": "2026-02-12", "clock_in": "2026-02-12T07:05:00", "clock_out": null, "total_hours": 0 }
+  ]
+}

@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Golden Thread — Production Management Prototype
+
+A high-fidelity prototype demonstrating the "Golden Thread" workflow: bridging granular estimating assemblies with real-time field productivity tracking and PM reconciliation.
+
+## The Problem
+
+Construction is losing veteran supervisors who can intuitively sense project delays. This prototype scales that intuition by creating a closed-loop system where data flows seamlessly from bid to closeout. See [`docs/01_Problem_Definition.md`](docs/01_Problem_Definition.md) for full context.
+
+## Workflow Phases
+
+| Phase | Page | Description |
+|-------|------|-------------|
+| **Dashboard** | `/` | Project overview with KPIs and navigation |
+| **A: Setup** | `/setup` | Map assemblies to WBS codes, set production targets |
+| **B: Capture** | `/capture` | Unified field entry for labor, equipment, and units |
+| **C: True-Up** | `/reconciliation` | PM reconciliation with performance signals |
+| **Closeout** | `/closeout` | Push final rates to estimating database |
+
+## Tech Stack
+
+- **Next.js 14+** (App Router) with TypeScript
+- **shadcn/ui** + Tailwind CSS
+- **@tanstack/react-table** for data grids
+- **Zustand** for state management
+- Mock data seeded from `src/data/golden_thread_data.json`
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx            # Dashboard
+│   ├── setup/              # Phase A: Baseline setup
+│   ├── capture/            # Phase B: Unified field capture
+│   ├── reconciliation/     # Phase C: PM True-Up
+│   └── closeout/           # Feedback loop
+├── components/             # React components
+│   ├── ui/                 # shadcn/ui primitives
+│   ├── assembly-picker.tsx # Multi-tier code picker
+│   ├── unified-grid.tsx    # Main foreman entry grid
+│   ├── claiming-sub-grid.tsx
+│   ├── material-drawdown.tsx
+│   ├── reconciliation-table.tsx
+│   ├── reverse-calculator.tsx
+│   └── closeout-panel.tsx
+├── store/                  # Zustand state management
+├── lib/                    # Calculation logic
+└── data/                   # Mock seed data
+docs/                       # Project documentation
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Problem Definition](docs/01_Problem_Definition.md)
+- [Workflow Definition](docs/02_Workflow_Definition.md)
+- [Solution Architecture](docs/03_Solution_Architecture.md)
+- [UI/UX Requirements](docs/04_UI_UX_Requirements.md)

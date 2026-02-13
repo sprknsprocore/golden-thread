@@ -1,0 +1,135 @@
+/* Figma design tokens – Helix Vision / Procore (node 5-24478) */
+:root {
+  /* Backgrounds */
+  --figma-bg-default: #ffffff;
+  --figma-bg-depth1: #f5f3f1;
+  --figma-bg-depth2: #faf7f5;
+  --figma-bg-nav: #2e2b28;
+  --figma-bg-outline: #1818182e;
+
+  /* Primary – Procore Orange (P1 CTAs only) */
+  --figma-primary-orange: #ff5200;
+  --figma-primary-orange-hover: #e64a00;
+
+  /* CTA tiers */
+  --figma-cta-p1-bg: #ff5200;
+  --figma-cta-p1-text: #ffffff;
+  --figma-cta-p2-bg: #5877781a;
+  --figma-cta-p2-text: #587778;
+  --figma-cta-p2-border: #58777880;
+  --figma-cta-p3-bg: transparent;
+  --figma-cta-p3-text: #18181899;
+  --figma-cta-p3-border: #1818182e;
+
+  /* Chart colors – single slate family, readable and calm (Linear / Notion style) */
+  --figma-chart-1: #64748b;
+  --figma-chart-2: #475569;
+  --figma-chart-3: #334155;
+  --figma-chart-muted: #94a3b8;
+  /* Exception/over in charts – one warm accent, not red */
+  --figma-chart-exception: #b45309;
+  --figma-chart-exception-light: rgba(180, 83, 9, 0.1);
+
+  /* Primary – Teal/Sage (secondary UI) */
+  --figma-primary-main: #587778;
+  --figma-primary-dark: #2f494a;
+  --figma-primary-stone: #ece0d6;
+  --figma-primary-selected: #5877781a;
+  --figma-primary-focused: #5877784d;
+
+  /* Text */
+  --figma-text-primary: #0f172a;
+  --figma-text-secondary: #475569;
+  --figma-text-tertiary: #64748b;
+  --figma-text-disabled: #94a3b8;
+
+  /* Semantic – same family as charts, minimal and clear */
+  --figma-success: #15803d;
+  --figma-success-light: #dcfce7;
+  --figma-error: #b91c1c;
+  --figma-error-light: #fee2e2;
+  --figma-info: #0369a1;
+  --figma-info-light: #e0f2fe;
+
+  /* Status labels: subtle (dot + text, no heavy pill) but clearly separated by hue */
+  --figma-status-available: #15803d;      /* green – in yard */
+  --figma-status-active: #2f494a;       /* teal-dark – in use (primary-dark) */
+  --figma-status-unavailable: #78716c;  /* warm stone – unavailable (distinct from green/teal) */
+
+  /* Layout */
+  --figma-radius-card: 8px;
+  --figma-radius-card-lg: 12px;
+  --figma-radius-pill: 999px;
+  --figma-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 2px 8px -2px rgba(0, 0, 0, 0.06);
+  --figma-shadow-card-hover: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+
+  /* Card base – global stroke/shadow (Linear-style). Use for all hub cards. */
+  --figma-card-stroke: rgba(0, 0, 0, 0.06);
+  --figma-card-stroke-hover: rgba(0, 0, 0, 0.08);
+  --figma-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --figma-card-shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.04);
+  --figma-card-accent: var(--figma-primary-main); /* left accent strip on cards */
+  --figma-card-accent-opacity: 0.5;
+  --figma-space-1: 4px;
+  --figma-space-2: 8px;
+  --figma-space-3: 12px;
+  --figma-space-4: 16px;
+  --figma-space-5: 24px;
+  --figma-nav-width: 56px;
+  --figma-nav-width-expanded: 240px;
+  /* Dark top bar (Procore-style) – aligned with Figma NGX Navigation */
+  --figma-topbar-bg: #1c1b19;
+  --figma-topbar-text: #ffffff;
+  --figma-topbar-text-muted: #acb5b9;
+  --figma-topbar-text-tertiary: #d6dadc;
+  --figma-topbar-border: rgba(255,255,255,0.08);
+  --figma-topbar-select-bg: rgba(255,255,255,0.08);
+  --figma-dropdown-bg: #ffffff;
+  --figma-dropdown-overlay: #ffffff1a;
+  --figma-nav-avatar-bg: #464f53;
+  --figma-brand: #ff5100;
+  --figma-drawer-width: 400px;
+  --figma-top-height: 56px;
+  --figma-header-height: 72px; /* single-row top bar */
+  --figma-domain-bar-height: 56px; /* Actions drawer header height */
+  --figma-drawer-top: var(--figma-top-height);
+  /* Content starts below TopRail (domain tabs are in sidebar) */
+  --figma-content-top: var(--figma-top-height);
+
+  /* Hub header – glassmorphism (Stripe/Linear) */
+  --figma-header-glass-bg: rgba(255, 255, 255, 0.72);
+  --figma-header-glass-border: rgba(148, 163, 184, 0.24);
+  --figma-header-font: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Bento grid – aligned row heights */
+  --bento-gap: 24px;
+  --bento-row-hero: 400px;   /* top row(s) – charts, map */
+  --bento-row-secondary: 340px; /* second row – charts full height */
+  --bento-row-action: 280px; /* action row – charts visible */
+}
+
+/* Card base – apply to article/wrapper for hub cards (stroke, shadow, hover). */
+.figma-card-base {
+  background-color: var(--figma-bg-default);
+  border: 1px solid var(--figma-card-stroke);
+  border-radius: var(--figma-radius-card-lg);
+  box-shadow: var(--figma-card-shadow);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.figma-card-base:hover {
+  box-shadow: var(--figma-card-shadow-hover);
+  border-color: var(--figma-card-stroke-hover);
+}
+.figma-card-base .figma-card-border {
+  border-color: var(--figma-card-stroke);
+}
+
+/* Bento grid row templates – use container queries so rows adapt to content area width, not viewport */
+@container (min-width: 640px) {
+  .bento-rows-hero-action {
+    grid-template-rows: minmax(0, auto) auto;
+  }
+  .bento-rows-hero-secondary {
+    grid-template-rows: minmax(0, auto) var(--bento-row-secondary);
+  }
+}
