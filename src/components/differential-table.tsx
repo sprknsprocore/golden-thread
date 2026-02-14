@@ -44,26 +44,22 @@ function formatCurrency(value: number): string {
 function VarianceBadge({ value, suffix = "" }: { value: number; suffix?: string }) {
   if (Math.abs(value) < 0.01) {
     return (
-      <Badge variant="outline" className="text-xs font-mono gap-1 text-muted-foreground">
-        <Minus className="h-3 w-3" />
-        0{suffix}
-      </Badge>
+      <span className="inline-flex items-center gap-0.5 rounded-full border bg-muted/50 px-2 py-0.5 text-[10px] font-mono font-medium text-muted-foreground leading-none">
+        <Minus className="h-3 w-3" />0{suffix}
+      </span>
     );
   }
   const isNegative = value < 0;
   return (
-    <Badge
-      variant="outline"
-      className={cn(
-        "text-xs font-mono gap-1",
-        isNegative
-          ? "border-green-500 text-green-700 bg-green-50"
-          : "border-red-500 text-red-700 bg-red-50"
-      )}
-    >
+    <span className={cn(
+      "inline-flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-[10px] font-mono font-medium leading-none",
+      isNegative
+        ? "border-green-500 text-green-700 bg-green-50"
+        : "border-red-500 text-red-700 bg-red-50"
+    )}>
       {isNegative ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
       {value > 0 ? "+" : ""}{value.toFixed(1)}{suffix}
-    </Badge>
+    </span>
   );
 }
 
@@ -237,198 +233,110 @@ export function DifferentialTable() {
             Budget, hours, and productivity aligned per WBS code. Green = under/on target. Red = over.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[180px]">Description</TableHead>
-                  {/* Quantity */}
-                  <TableHead className="text-center bg-muted/20" colSpan={3}>
-                    Quantity
-                  </TableHead>
-                  {/* Hours */}
-                  <TableHead className="text-center bg-blue-50/30" colSpan={4}>
-                    Hours
-                  </TableHead>
-                  {/* Cost */}
-                  <TableHead className="text-center bg-amber-50/30" colSpan={3}>
-                    Cost
-                  </TableHead>
-                  {/* Signal */}
-                  <TableHead className="text-center" colSpan={2}>
-                    Signal
-                  </TableHead>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/10 sticky top-0 z-10">
+                <TableHead className="w-[180px] text-xs font-medium">Description</TableHead>
+                <TableHead className="text-right text-xs font-medium">Qty Budget</TableHead>
+                <TableHead className="text-right text-xs font-medium">Qty Actual</TableHead>
+                <TableHead className="text-center text-xs font-medium">% Complete</TableHead>
+                <TableHead className="text-right text-xs font-medium">Hrs Budget</TableHead>
+                <TableHead className="text-right text-xs font-medium">Hrs Earned</TableHead>
+                <TableHead className="text-right text-xs font-medium">Hrs Actual</TableHead>
+                <TableHead className="text-center text-xs font-medium">Hrs Diff</TableHead>
+                <TableHead className="text-right text-xs font-medium">Cost Budget</TableHead>
+                <TableHead className="text-right text-xs font-medium">Cost Actual</TableHead>
+                <TableHead className="text-center text-xs font-medium">Cost Var</TableHead>
+                <TableHead className="text-center text-xs font-medium w-[60px]">PF</TableHead>
+                <TableHead className="text-center text-xs font-medium w-[50px]">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {analysisData.map((row) => (
+                <TableRow key={row.wbs_code} className="h-12">
+                  <TableCell>
+                    <p className="font-medium text-sm leading-tight">{row.description}</p>
+                    <p className="text-xs text-muted-foreground font-mono">{row.wbs_code}</p>
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm">
+                    {row.budgeted_qty.toLocaleString()} {row.uom}
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm">
+                    {row.actual_qty > 0 ? `${row.actual_qty.toLocaleString()} ${row.uom}` : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5 min-w-[80px]">
+                      <Progress value={row.qty_pct_complete} className="h-1.5 flex-1" />
+                      <span className="text-[11px] font-mono w-8 text-right">{row.qty_pct_complete.toFixed(0)}%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm">{row.budgeted_hours.toFixed(0)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{row.earned_hours > 0 ? row.earned_hours.toFixed(1) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{row.actual_hours > 0 ? row.actual_hours.toFixed(1) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-center">
+                    {row.actual_hours > 0 ? <VarianceBadge value={row.hour_differential} suffix="h" /> : <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm">{formatCurrency(row.budgeted_cost)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{row.actual_cost > 0 ? formatCurrency(row.actual_cost) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-center">
+                    {row.actual_cost > 0 ? <VarianceBadge value={row.cost_variance_pct} suffix="%" /> : <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <PFBadge pf={row.performance_factor} hasData={row.actual_hours > 0} />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <StatusIcon status={row.status} />
+                  </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableHead />
-                  {/* Quantity sub-headers */}
-                  <TableHead className="text-right bg-muted/20 text-xs">Budget</TableHead>
-                  <TableHead className="text-right bg-muted/20 text-xs">Actual</TableHead>
-                  <TableHead className="text-center bg-muted/20 text-xs">% Complete</TableHead>
-                  {/* Hours sub-headers */}
-                  <TableHead className="text-right bg-blue-50/30 text-xs">Budget</TableHead>
-                  <TableHead className="text-right bg-blue-50/30 text-xs">Earned</TableHead>
-                  <TableHead className="text-right bg-blue-50/30 text-xs">Actual</TableHead>
-                  <TableHead className="text-center bg-blue-50/30 text-xs">Diff</TableHead>
-                  {/* Cost sub-headers */}
-                  <TableHead className="text-right bg-amber-50/30 text-xs">Budget</TableHead>
-                  <TableHead className="text-right bg-amber-50/30 text-xs">Actual</TableHead>
-                  <TableHead className="text-center bg-amber-50/30 text-xs">Variance</TableHead>
-                  {/* Signal sub-headers */}
-                  <TableHead className="text-center text-xs">PF</TableHead>
-                  <TableHead className="text-center text-xs">Status</TableHead>
+              ))}
+
+              {/* Totals row */}
+              {analysisData.length > 0 && (
+                <TableRow className="border-t-2 font-semibold bg-muted/30 h-12">
+                  <TableCell className="text-sm">Project Totals</TableCell>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell />
+                  <TableCell className="text-right font-mono text-sm">{totals.budgeted_hours.toFixed(0)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{totals.earned_hours > 0 ? totals.earned_hours.toFixed(1) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{totals.actual_hours > 0 ? totals.actual_hours.toFixed(1) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-center">
+                    {hasData ? <VarianceBadge value={overallHourVariance} suffix="h" /> : <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm">{formatCurrency(totals.budgeted_cost)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{totals.actual_cost > 0 ? formatCurrency(totals.actual_cost) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-center">
+                    {hasData ? <VarianceBadge value={totals.budgeted_cost !== 0 ? (overallCostVariance / totals.budgeted_cost) * 100 : 0} suffix="%" /> : <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <PFBadge pf={overallPF} hasData={hasData} />
+                  </TableCell>
+                  <TableCell />
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {analysisData.map((row) => (
-                  <TableRow key={row.wbs_code}>
-                    {/* Description */}
-                    <TableCell>
-                      <p className="font-medium text-sm">{row.description}</p>
-                      <p className="text-xs text-muted-foreground">{row.wbs_code}</p>
-                    </TableCell>
+              )}
 
-                    {/* Quantity: Budget */}
-                    <TableCell className="text-right font-mono text-sm bg-muted/10">
-                      {row.budgeted_qty.toLocaleString()} {row.uom}
-                    </TableCell>
-                    {/* Quantity: Actual */}
-                    <TableCell className="text-right font-mono text-sm bg-muted/10">
-                      {row.actual_qty > 0 ? `${row.actual_qty.toLocaleString()} ${row.uom}` : "—"}
-                    </TableCell>
-                    {/* Quantity: % Complete */}
-                    <TableCell className="bg-muted/10">
-                      <div className="flex items-center gap-2 min-w-[80px]">
-                        <Progress value={row.qty_pct_complete} className="h-2 flex-1" />
-                        <span className="text-xs font-mono w-10 text-right">
-                          {row.qty_pct_complete.toFixed(0)}%
-                        </span>
-                      </div>
-                    </TableCell>
-
-                    {/* Hours: Budget */}
-                    <TableCell className="text-right font-mono text-sm bg-blue-50/10">
-                      {row.budgeted_hours.toFixed(0)}
-                    </TableCell>
-                    {/* Hours: Earned */}
-                    <TableCell className="text-right font-mono text-sm bg-blue-50/10">
-                      {row.earned_hours > 0 ? row.earned_hours.toFixed(1) : "—"}
-                    </TableCell>
-                    {/* Hours: Actual */}
-                    <TableCell className="text-right font-mono text-sm bg-blue-50/10">
-                      {row.actual_hours > 0 ? row.actual_hours.toFixed(1) : "—"}
-                    </TableCell>
-                    {/* Hours: Differential */}
-                    <TableCell className="text-center bg-blue-50/10">
-                      {row.actual_hours > 0 ? (
-                        <VarianceBadge value={row.hour_differential} suffix="h" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-
-                    {/* Cost: Budget */}
-                    <TableCell className="text-right font-mono text-sm bg-amber-50/10">
-                      {formatCurrency(row.budgeted_cost)}
-                    </TableCell>
-                    {/* Cost: Actual */}
-                    <TableCell className="text-right font-mono text-sm bg-amber-50/10">
-                      {row.actual_cost > 0 ? formatCurrency(row.actual_cost) : "—"}
-                    </TableCell>
-                    {/* Cost: Variance */}
-                    <TableCell className="text-center bg-amber-50/10">
-                      {row.actual_cost > 0 ? (
-                        <VarianceBadge value={row.cost_variance_pct} suffix="%" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-
-                    {/* PF */}
-                    <TableCell className="text-center">
-                      <PFBadge pf={row.performance_factor} hasData={row.actual_hours > 0} />
-                    </TableCell>
-
-                    {/* Status */}
-                    <TableCell className="text-center">
-                      <StatusIcon status={row.status} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-
-                {/* Totals row */}
-                {analysisData.length > 0 && (
-                  <TableRow className="border-t-2 font-semibold bg-muted/5">
-                    <TableCell className="text-sm">Project Totals</TableCell>
-                    {/* Qty cols — no meaningful total */}
-                    <TableCell className="bg-muted/10" />
-                    <TableCell className="bg-muted/10" />
-                    <TableCell className="bg-muted/10" />
-                    {/* Hours */}
-                    <TableCell className="text-right font-mono text-sm bg-blue-50/10">
-                      {totals.budgeted_hours.toFixed(0)}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm bg-blue-50/10">
-                      {totals.earned_hours > 0 ? totals.earned_hours.toFixed(1) : "—"}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm bg-blue-50/10">
-                      {totals.actual_hours > 0 ? totals.actual_hours.toFixed(1) : "—"}
-                    </TableCell>
-                    <TableCell className="text-center bg-blue-50/10">
-                      {hasData ? (
-                        <VarianceBadge value={overallHourVariance} suffix="h" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    {/* Cost */}
-                    <TableCell className="text-right font-mono text-sm bg-amber-50/10">
-                      {formatCurrency(totals.budgeted_cost)}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm bg-amber-50/10">
-                      {totals.actual_cost > 0 ? formatCurrency(totals.actual_cost) : "—"}
-                    </TableCell>
-                    <TableCell className="text-center bg-amber-50/10">
-                      {hasData ? (
-                        <VarianceBadge
-                          value={totals.budgeted_cost !== 0 ? (overallCostVariance / totals.budgeted_cost) * 100 : 0}
-                          suffix="%"
-                        />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    {/* PF */}
-                    <TableCell className="text-center">
-                      <PFBadge pf={overallPF} hasData={hasData} />
-                    </TableCell>
-                    <TableCell />
-                  </TableRow>
-                )}
-
-                {analysisData.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={13} className="text-center py-12">
-                      <ClipboardList className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground">
-                        No production data to analyze yet.
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1 mb-3">
-                        Complete Setup and Capture to populate the analysis view.
-                      </p>
-                      <Button asChild variant="outline" size="sm" className="gap-1.5">
-                        <Link href="/capture">
-                          <ClipboardList className="h-3.5 w-3.5" />
-                          Go to Capture
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+              {analysisData.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={13} className="text-center py-12">
+                    <ClipboardList className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">
+                      No production data to analyze yet.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1 mb-3">
+                      Complete Setup and Capture to populate the analysis view.
+                    </p>
+                    <Button asChild variant="outline" size="sm" className="gap-1.5">
+                      <Link href="/capture">
+                        <ClipboardList className="h-3.5 w-3.5" />
+                        Go to Capture
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

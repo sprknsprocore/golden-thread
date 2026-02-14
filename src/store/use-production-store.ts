@@ -31,6 +31,17 @@ export interface CrewTemplateMember {
   count: number;
 }
 
+export interface WorkPackageComponent {
+  id: string;
+  name: string;
+  plan_qty: number;
+  uom: string;
+  budgeted_hours: number;
+  production_rate: number;  // derived: plan_qty / budgeted_hours
+  weight: number;           // derived: budgeted_hours / parent total hours
+  qty_installed: number;
+}
+
 export interface Assembly {
   wbs_code: string;
   description: string;
@@ -41,6 +52,7 @@ export interface Assembly {
   blended_unit_cost: number;
   crew_template: CrewTemplateMember[];
   materials: MaterialRequirement[];
+  components?: WorkPackageComponent[];
 }
 
 export interface InventoryItem {
@@ -157,6 +169,14 @@ interface ProductionStore {
   // Assembly actions
   addAssembly: (assembly: Assembly) => void;
 
+  // Work Package component actions
+  setComponentQtyInstalled: (wbsCode: string, componentId: string, qty: number) => void;
+  updateAssemblyComponents: (wbsCode: string, components: WorkPackageComponent[]) => void;
+  addAssemblyComponent: (wbsCode: string, component: Omit<WorkPackageComponent, "production_rate" | "weight">) => void;
+  removeAssemblyComponent: (wbsCode: string, componentId: string) => void;
+  updateAssemblyComponent: (wbsCode: string, componentId: string, updates: Partial<Pick<WorkPackageComponent, "name" | "plan_qty" | "uom" | "budgeted_hours">>) => void;
+  updateComponentByRate: (wbsCode: string, componentId: string, planQty: number, productionRate: number) => void;
+
   // Provisional code actions
   addProvisionalCode: (wbsCode: string) => void;
   removeProvisionalCode: (wbsCode: string) => void;
@@ -195,6 +215,27 @@ interface ProductionStore {
   resetStore: () => void;
 }
 
+/* ---------- Work Package Helpers ---------- */
+
+function recalcComponentDerived(
+  components: WorkPackageComponent[],
+  totalBudgetedHours: number
+): WorkPackageComponent[] {
+  return components.map((c) => ({
+    ...c,
+    production_rate: c.budgeted_hours > 0 ? c.plan_qty / c.budgeted_hours : 0,
+    weight: totalBudgetedHours > 0 ? c.budgeted_hours / totalBudgetedHours : 0,
+  }));
+}
+
+function updateAssemblyWithComponents(
+  assemblies: Assembly[],
+  wbsCode: string,
+  updater: (assembly: Assembly) => Assembly
+): Assembly[] {
+  return assemblies.map((a) => (a.wbs_code === wbsCode ? updater(a) : a));
+}
+
 /* ---------- Seed Helpers ---------- */
 
 const schemaMap: Record<string, ClaimingSchema> = {};
@@ -204,11 +245,26 @@ for (const [, schema] of Object.entries(seedData.claiming_schema_library)) {
 
 const initialState = {
   projectMetadata: seedData.project_metadata as ProjectMetadata,
-  assemblies: seedData.active_assemblies.map((a) => ({
-    ...a,
-    crew_template: (a as Record<string, unknown>).crew_template as CrewTemplateMember[] ?? [],
-    materials: a.materials ?? [],
-  })) as Assembly[],
+  assemblies: seedData.active_assemblies.map((a) => {
+    const raw = a as Record<string, unknown>;
+    const crew = (raw.crew_template as CrewTemplateMember[]) ?? [];
+    const mats = (a.materials ?? []) as MaterialRequirement[];
+    const rawComponents = raw.components as Array<{
+      id: string; name: string; plan_qty: number; uom: string; budgeted_hours: number;
+    }> | undefined;
+    const components: WorkPackageComponent[] | undefined = rawComponents
+      ? recalcComponentDerived(
+          rawComponents.map((c) => ({ ...c, production_rate: 0, weight: 0, qty_installed: 0 })),
+          a.budgeted_hours
+        )
+      : undefined;
+    return {
+      ...a,
+      crew_template: crew,
+      materials: mats,
+      ...(components ? { components } : {}),
+    };
+  }) as Assembly[],
   claimingSchemas: schemaMap,
   provisionalCodes: [...seedData.provisional_wbs_codes],
   mockInventory: seedData.mock_inventory.map((i) => ({ ...i })) as InventoryItem[],
@@ -232,6 +288,67 @@ export const useProductionStore = create<ProductionStore>((set) => ({
   addAssembly: (assembly) =>
     set((state) => ({
       assemblies: [...state.assemblies, assembly],
+    })),
+
+  // Work Package component actions
+  setComponentQtyInstalled: (wbsCode, componentId, qty) =>
+    set((state) => ({
+      assemblies: updateAssemblyWithComponents(state.assemblies, wbsCode, (a) => ({
+        ...a,
+        components: a.components?.map((c) =>
+          c.id === componentId ? { ...c, qty_installed: qty } : c
+        ),
+      })),
+    })),
+
+  updateAssemblyComponents: (wbsCode, components) =>
+    set((state) => ({
+      assemblies: updateAssemblyWithComponents(state.assemblies, wbsCode, (a) => ({
+        ...a,
+        components: recalcComponentDerived(components, a.budgeted_hours),
+      })),
+    })),
+
+  addAssemblyComponent: (wbsCode, component) =>
+    set((state) => ({
+      assemblies: updateAssemblyWithComponents(state.assemblies, wbsCode, (a) => {
+        const newComp: WorkPackageComponent = { ...component, production_rate: 0, weight: 0 };
+        const updated = [...(a.components ?? []), newComp];
+        const totalHrs = updated.reduce((s, c) => s + c.budgeted_hours, 0);
+        return { ...a, budgeted_hours: totalHrs, components: recalcComponentDerived(updated, totalHrs) };
+      }),
+    })),
+
+  removeAssemblyComponent: (wbsCode, componentId) =>
+    set((state) => ({
+      assemblies: updateAssemblyWithComponents(state.assemblies, wbsCode, (a) => {
+        const updated = (a.components ?? []).filter((c) => c.id !== componentId);
+        const totalHrs = updated.reduce((s, c) => s + c.budgeted_hours, 0);
+        return { ...a, budgeted_hours: totalHrs, components: recalcComponentDerived(updated, totalHrs) };
+      }),
+    })),
+
+  updateAssemblyComponent: (wbsCode, componentId, updates) =>
+    set((state) => ({
+      assemblies: updateAssemblyWithComponents(state.assemblies, wbsCode, (a) => {
+        const updated = (a.components ?? []).map((c) =>
+          c.id === componentId ? { ...c, ...updates } : c
+        );
+        const totalHrs = updated.reduce((s, c) => s + c.budgeted_hours, 0);
+        return { ...a, budgeted_hours: totalHrs, components: recalcComponentDerived(updated, totalHrs) };
+      }),
+    })),
+
+  updateComponentByRate: (wbsCode, componentId, planQty, productionRate) =>
+    set((state) => ({
+      assemblies: updateAssemblyWithComponents(state.assemblies, wbsCode, (a) => {
+        const budgetedHours = productionRate > 0 ? planQty / productionRate : 0;
+        const updated = (a.components ?? []).map((c) =>
+          c.id === componentId ? { ...c, plan_qty: planQty, budgeted_hours: budgetedHours } : c
+        );
+        const totalHrs = updated.reduce((s, c) => s + c.budgeted_hours, 0);
+        return { ...a, budgeted_hours: totalHrs, components: recalcComponentDerived(updated, totalHrs) };
+      }),
     })),
 
   // Provisional code actions
@@ -457,7 +574,45 @@ export const useProductionStore = create<ProductionStore>((set) => ({
         },
       ];
 
-      const allEvents = [...rcp12Events, ...rcp30Events, ...formEvents];
+      // ---- Shallow Depth Concrete Repair (03-310.SDCR) ---- Work Package demo
+      // Budget: 16 SQFT, 59 hrs, 5 components
+      const sdcrEvents: ProductionEvent[] = [
+        {
+          id: id(), wbs_code: "03-310.SDCR", date: mon,
+          actual_hours: 8, actual_qty: 4, equipment_hours: 0,
+          description: "Cutting and demo started. Good access to repair area.",
+          claiming_progress: [], source: "kiosk",
+        },
+        {
+          id: id(), wbs_code: "03-310.SDCR", date: tue,
+          actual_hours: 9, actual_qty: 3, equipment_hours: 0,
+          description: "Rebar placement underway. Some congestion issues.",
+          claiming_progress: [], source: "kiosk",
+        },
+        {
+          id: id(), wbs_code: "03-310.SDCR", date: wed,
+          actual_hours: 8, actual_qty: 3, equipment_hours: 0,
+          description: "CIP concrete pour for first patches.",
+          claiming_progress: [], source: "kiosk",
+        },
+      ];
+
+      const allEvents = [...rcp12Events, ...rcp30Events, ...formEvents, ...sdcrEvents];
+
+      // Seed component progress for SDCR work package
+      const updatedAssemblies = state.assemblies.map((a) => {
+        if (a.wbs_code === "03-310.SDCR" && a.components) {
+          const updatedComponents = a.components.map((c) => {
+            if (c.id === "comp_1") return { ...c, qty_installed: 6 };   // Cutting: 6/8 LF (75%)
+            if (c.id === "comp_2") return { ...c, qty_installed: 10 };  // Demo: 10/16 SQFT (62.5%)
+            if (c.id === "comp_3") return { ...c, qty_installed: 8 };   // Rebar: 8/24 EA (33%)
+            if (c.id === "comp_4") return { ...c, qty_installed: 3 };   // CIP: 3/16 SQFT (19%)
+            return c; // Cleanup: 0 (not started)
+          });
+          return { ...a, components: updatedComponents };
+        }
+        return a;
+      });
 
       // PM Override for 30-inch RCP (field underreported qty)
       const demoOverrides: PmOverride[] = [
@@ -489,6 +644,7 @@ export const useProductionStore = create<ProductionStore>((set) => ({
       });
 
       return {
+        assemblies: updatedAssemblies,
         productionEvents: allEvents,
         pmOverrides: demoOverrides,
         trueUpStatuses: { "02-750.steel.z-loop-30": "adjusted" as TrueUpStatus },

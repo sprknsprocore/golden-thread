@@ -728,24 +728,24 @@ function CodeReviewCard({
                     <div className="border rounded-md overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-muted/30">
-                            <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Date</th>
-                            <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Hours</th>
-                            <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Qty</th>
-                            <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Equip</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-muted-foreground">Source</th>
-                            <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Note</th>
+                          <tr className="bg-muted/10">
+                            <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground">Date</th>
+                            <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground">Hours</th>
+                            <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground">Qty</th>
+                            <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground">Equip</th>
+                            <th className="px-2 py-1.5 text-center text-xs font-medium text-muted-foreground">Source</th>
+                            <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground">Note</th>
                           </tr>
                         </thead>
                         <tbody>
                           {data.dailyBreakdown.map((entry, i) => (
-                            <tr key={i} className="border-t">
+                            <tr key={i} className="border-t h-10">
                               <td className="px-2 py-1.5 font-mono">{entry.date}</td>
                               <td className="px-2 py-1.5 text-right font-mono">{entry.hours.toFixed(1)}</td>
                               <td className="px-2 py-1.5 text-right font-mono">{entry.qty}</td>
                               <td className="px-2 py-1.5 text-right font-mono">{entry.equipHours > 0 ? entry.equipHours.toFixed(1) : "—"}</td>
                               <td className="px-2 py-1.5 text-center">
-                                <Badge variant="outline" className="text-[9px]">
+                                <Badge variant="outline" className="text-[9px] font-normal">
                                   {entry.source}
                                 </Badge>
                               </td>

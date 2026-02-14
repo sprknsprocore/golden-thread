@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Users, PenLine } from "lucide-react";
+import { CalendarDays, Users, PenLine, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DailyLog } from "@/components/daily-log";
 import { UnifiedGrid } from "@/components/unified-grid";
 import { WeeklyGrid } from "@/components/weekly-grid";
 import { MaterialDrawdown } from "@/components/material-drawdown";
+import { useProductionStore } from "@/store/use-production-store";
 import { cn } from "@/lib/utils";
 
 type CaptureMode = "weekly" | "daily-log" | "manual";
@@ -22,81 +23,74 @@ const modeDescriptions: Record<CaptureMode, string> = {
 
 export default function CapturePage() {
   const [mode, setMode] = useState<CaptureMode>("weekly");
+  const { projectMetadata } = useProductionStore();
 
   return (
-    <div className="space-y-0">
-      {/* Control bar — Procore-style View/Filter row */}
-      <div
-        className="bg-white border-b px-6 py-2.5 flex items-center justify-between"
-        style={{ borderColor: "var(--figma-bg-outline)" }}
-      >
-        <p className="text-sm text-muted-foreground">
-          {modeDescriptions[mode]}
-        </p>
+    <div className="flex flex-col h-full">
 
-        {/* Mode toggle — styled like Procore's view selector */}
+      {/* PAGE HEADER */}
+      <div className="shrink-0 bg-white border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "var(--figma-bg-outline)" }}>
+        <div>
+          <p className="text-xs text-muted-foreground mb-0.5">
+            Home &middot; {projectMetadata.name} &middot; Financial Management
+          </p>
+          <h1 className="text-xl font-semibold tracking-tight">Field Capture</h1>
+        </div>
         <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
           <Button
             variant={mode === "weekly" ? "default" : "ghost"}
             size="sm"
-            className={cn(
-              "gap-1.5 text-xs h-7",
-              mode !== "weekly" && "text-muted-foreground"
-            )}
+            className={cn("gap-1.5 text-xs h-7", mode !== "weekly" && "text-muted-foreground")}
             onClick={() => setMode("weekly")}
           >
-            <CalendarDays className="h-3.5 w-3.5" />
-            Weekly Grid
+            <CalendarDays className="h-3.5 w-3.5" />Weekly Grid
           </Button>
           <Button
             variant={mode === "daily-log" ? "default" : "ghost"}
             size="sm"
-            className={cn(
-              "gap-1.5 text-xs h-7",
-              mode !== "daily-log" && "text-muted-foreground"
-            )}
+            className={cn("gap-1.5 text-xs h-7", mode !== "daily-log" && "text-muted-foreground")}
             onClick={() => setMode("daily-log")}
           >
-            <Users className="h-3.5 w-3.5" />
-            Daily Log
+            <Users className="h-3.5 w-3.5" />Daily Log
           </Button>
           <Button
             variant={mode === "manual" ? "default" : "ghost"}
             size="sm"
-            className={cn(
-              "gap-1.5 text-xs h-7",
-              mode !== "manual" && "text-muted-foreground"
-            )}
+            className={cn("gap-1.5 text-xs h-7", mode !== "manual" && "text-muted-foreground")}
             onClick={() => setMode("manual")}
           >
-            <PenLine className="h-3.5 w-3.5" />
-            Manual Entry
+            <PenLine className="h-3.5 w-3.5" />Manual Entry
           </Button>
         </div>
       </div>
 
-      <div className="p-6">
-        {mode === "weekly" ? (
-          /* Weekly grid gets full width with sidebar */
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-6">
-            <div className="min-w-0">
-              <WeeklyGrid />
+      {/* CONTENT — weekly mode gets full-bleed table, other modes get padded layout */}
+      {mode === "weekly" ? (
+        <WeeklyGrid />
+      ) : (
+        <>
+          <div className="shrink-0 bg-white border-b px-6 py-2 flex items-center justify-between" style={{ borderColor: "var(--figma-bg-outline)" }}>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 border rounded-md w-48 bg-white" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Search...</span>
+              </div>
+              <button className="flex items-center gap-1 px-2.5 py-1.5 text-xs border rounded-md text-muted-foreground hover:bg-muted/30 transition-colors" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                <Filter className="h-3.5 w-3.5" />Filter
+              </button>
             </div>
-            <div className="space-y-4">
-              <MaterialDrawdown />
+            <p className="text-xs text-muted-foreground">{modeDescriptions[mode]}</p>
+          </div>
+          <div className="flex-1 overflow-auto p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
+              <div className="min-w-0">
+                {mode === "daily-log" ? <DailyLog /> : <UnifiedGrid />}
+              </div>
+              <div className="space-y-4"><MaterialDrawdown /></div>
             </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
-            <div className="min-w-0">
-              {mode === "daily-log" ? <DailyLog /> : <UnifiedGrid />}
-            </div>
-            <div className="space-y-4">
-              <MaterialDrawdown />
-            </div>
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }

@@ -74,12 +74,34 @@
         { "role": "Laborer", "count": 2 }
       ],
       "materials": []
+    },
+    {
+      "wbs_code": "03-310.SDCR",
+      "description": "Shallow Depth Concrete Repair",
+      "budgeted_qty": 16,
+      "uom": "SQFT",
+      "budgeted_hours": 59,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 185.00,
+      "crew_template": [
+        { "role": "Carpenter", "count": 2 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [],
+      "components": [
+        { "id": "comp_1", "name": "Cutting",      "plan_qty": 8,  "uom": "LF",   "budgeted_hours": 10 },
+        { "id": "comp_2", "name": "Demo",          "plan_qty": 16, "uom": "SQFT", "budgeted_hours": 12 },
+        { "id": "comp_3", "name": "Rebar",         "plan_qty": 24, "uom": "EA",   "budgeted_hours": 15 },
+        { "id": "comp_4", "name": "CIP Concrete",  "plan_qty": 16, "uom": "SQFT", "budgeted_hours": 14 },
+        { "id": "comp_5", "name": "Cleanup",       "plan_qty": 16, "uom": "SQFT", "budgeted_hours": 8  }
+      ]
     }
   ],
   "provisional_wbs_codes": [
     "02-750.steel.z-loop",
     "02-750.steel.z-loop-30",
-    "03-310.TL"
+    "03-310.TL",
+    "03-310.SDCR"
   ],
   "mock_inventory": [
     { "item": "RCP Pipe 12\"", "on_hand": 1000, "uom": "LF" },

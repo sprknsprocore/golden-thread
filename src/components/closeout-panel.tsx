@@ -78,7 +78,6 @@ export function CloseoutPanel() {
           ? ((finalRate - budgetedRate) / budgetedRate) * 100
           : 0;
 
-      // Derive pushed state from store
       const isPushed = estimatingDatabase.some(
         (r) => r.wbs_code === assembly.wbs_code
       );
@@ -139,41 +138,42 @@ export function CloseoutPanel() {
 
   if (rateData.length === 0) {
     return (
-      <div className="text-center py-16">
-        {productionEvents.length === 0 ? (
-          <>
-            <ClipboardList className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-sm text-muted-foreground">
-              No production data available yet.
-            </p>
-            <p className="text-xs text-muted-foreground mt-1 mb-4">
-              Complete field capture and True-Up before generating final rates.
-            </p>
-            <Button asChild variant="outline" size="sm" className="gap-1.5">
-              <Link href="/capture">
-                <ClipboardList className="h-3.5 w-3.5" />
-                Go to Capture
-              </Link>
-            </Button>
-          </>
-        ) : (
-          <>
-            <GitCompareArrows className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-sm text-muted-foreground">
-              Field data exists but needs reconciliation.
-            </p>
-            <p className="text-xs text-muted-foreground mt-1 mb-4">
-              Complete the True-Up step to validate quantities before pushing
-              rates.
-            </p>
-            <Button asChild variant="outline" size="sm" className="gap-1.5">
-              <Link href="/reconciliation">
-                <GitCompareArrows className="h-3.5 w-3.5" />
-                Go to True-Up
-              </Link>
-            </Button>
-          </>
-        )}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center py-16">
+          {productionEvents.length === 0 ? (
+            <>
+              <ClipboardList className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-sm text-muted-foreground">
+                No production data available yet.
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 mb-4">
+                Complete field capture and True-Up before generating final rates.
+              </p>
+              <Button asChild variant="outline" size="sm" className="gap-1.5">
+                <Link href="/capture">
+                  <ClipboardList className="h-3.5 w-3.5" />
+                  Go to Capture
+                </Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <GitCompareArrows className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-sm text-muted-foreground">
+                Field data exists but needs reconciliation.
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 mb-4">
+                Complete the True-Up step to validate quantities before pushing rates.
+              </p>
+              <Button asChild variant="outline" size="sm" className="gap-1.5">
+                <Link href="/reconciliation">
+                  <GitCompareArrows className="h-3.5 w-3.5" />
+                  Go to True-Up
+                </Link>
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     );
   }
@@ -181,12 +181,12 @@ export function CloseoutPanel() {
   /* ---------- Main render ---------- */
 
   return (
-    <div className="space-y-0">
-      {/* Full-width table — no card wrapper */}
-      <div className="rounded-lg border bg-white overflow-x-auto">
+    <>
+      {/* SCROLLABLE TABLE */}
+      <div className="flex-1 overflow-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/20">
+            <TableRow className="bg-muted/10 sticky top-0 z-10">
               <TableHead className="w-10 text-center">
                 <input
                   type="checkbox"
@@ -196,17 +196,13 @@ export function CloseoutPanel() {
                   disabled={pushableItems.length === 0}
                 />
               </TableHead>
-              <TableHead className="w-[250px] text-xs">Description</TableHead>
-              <TableHead className="text-right text-xs">Final Qty</TableHead>
-              <TableHead className="text-right text-xs">Final Hrs</TableHead>
-              <TableHead className="text-right text-xs">
-                Budgeted Rate (MH/Unit)
-              </TableHead>
-              <TableHead className="text-right text-xs">
-                Actual Rate (MH/Unit)
-              </TableHead>
-              <TableHead className="text-center text-xs">Variance</TableHead>
-              <TableHead className="text-center text-xs w-20">Status</TableHead>
+              <TableHead className="w-[250px] text-xs font-medium">Description</TableHead>
+              <TableHead className="text-right text-xs font-medium">Final Qty</TableHead>
+              <TableHead className="text-right text-xs font-medium">Final Hrs</TableHead>
+              <TableHead className="text-right text-xs font-medium">Budget Rate</TableHead>
+              <TableHead className="text-right text-xs font-medium">Actual Rate</TableHead>
+              <TableHead className="text-center text-xs font-medium">Variance</TableHead>
+              <TableHead className="text-center text-xs font-medium w-20">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -219,7 +215,7 @@ export function CloseoutPanel() {
               return (
                 <TableRow
                   key={d.wbs_code}
-                  className={cn("h-12", d.isPushed && "bg-green-50/40")}
+                  className={cn("h-12", d.isPushed && "bg-green-50/30")}
                 >
                   <TableCell className="text-center">
                     <input
@@ -231,64 +227,47 @@ export function CloseoutPanel() {
                     />
                   </TableCell>
                   <TableCell>
-                    <div
-                      className={cn(d.isPushed && "border-l-2 border-green-500 pl-2")}
-                    >
-                      <p className="font-medium text-sm">{d.description}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {d.wbs_code}
-                      </p>
+                    <div className={cn(d.isPushed && "border-l-2 border-green-500 pl-2")}>
+                      <p className="font-medium text-sm leading-tight">{d.description}</p>
+                      <p className="text-xs text-muted-foreground font-mono">{d.wbs_code}</p>
                     </div>
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm">
-                    {d.finalQty > 0
-                      ? `${d.finalQty.toLocaleString()} ${d.uom}`
-                      : "—"}
+                    {d.finalQty > 0 ? `${d.finalQty.toLocaleString()} ${d.uom}` : <span className="text-muted-foreground">—</span>}
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm">
-                    {d.finalHours > 0 ? d.finalHours.toFixed(1) : "—"}
+                    {d.finalHours > 0 ? d.finalHours.toFixed(1) : <span className="text-muted-foreground">—</span>}
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm">
                     {d.budgetedRate.toFixed(4)}
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm">
-                    {d.finalHours > 0 ? d.finalRate.toFixed(4) : "—"}
+                    {d.finalHours > 0 ? d.finalRate.toFixed(4) : <span className="text-muted-foreground">—</span>}
                   </TableCell>
                   <TableCell className="text-center">
                     {d.finalHours > 0 ? (
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "font-mono gap-1",
-                          isImproved
-                            ? "text-green-700 border-green-500 bg-green-50"
-                            : "text-red-700 border-red-500 bg-red-50"
-                        )}
-                      >
-                        {isImproved ? (
-                          <TrendingDown className="h-3 w-3" />
-                        ) : (
-                          <TrendingUp className="h-3 w-3" />
-                        )}
-                        {d.variance > 0 ? "+" : ""}
-                        {d.variance.toFixed(1)}%
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
-                        No data
+                      <span className={cn(
+                        "inline-flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-[10px] font-mono font-medium leading-none",
+                        isImproved
+                          ? "text-green-700 border-green-500 bg-green-50"
+                          : "text-red-700 border-red-500 bg-red-50"
+                      )}>
+                        {isImproved ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
+                        {d.variance > 0 ? "+" : ""}{d.variance.toFixed(1)}%
                       </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </TableCell>
                   <TableCell className="text-center">
                     {d.isPushed ? (
-                      <Badge variant="outline" className="text-[10px] gap-1 border-green-500 text-green-700 bg-green-50">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Pushed
-                      </Badge>
+                      <span className="inline-flex items-center gap-0.5 rounded-full border border-green-500 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700 leading-none">
+                        <CheckCircle2 className="h-3 w-3" />Pushed
+                      </span>
                     ) : d.finalHours > 0 ? (
-                      <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                      <span className="inline-flex items-center rounded-full border bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground leading-none">
                         Ready
-                      </Badge>
+                      </span>
                     ) : (
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
@@ -300,92 +279,77 @@ export function CloseoutPanel() {
         </Table>
       </div>
 
-      {/* Footer action bar */}
-      <div
-        className="bg-white border rounded-b-lg border-t-0 px-6 py-4 flex items-center justify-between -mt-px"
-        style={{ borderColor: "var(--figma-bg-outline)" }}
-      >
-        <div className="flex items-center gap-3">
-          <Database className="h-4 w-4 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            {allPushed
-              ? `All rates transferred to estimating database.`
-              : selectedPushable.length > 0
-              ? `${selectedPushable.length} code${selectedPushable.length !== 1 ? "s" : ""} selected to push.`
-              : `${pushableItems.length} code${pushableItems.length !== 1 ? "s" : ""} with production data ready to push.`}
-          </p>
-        </div>
-        {allPushed ? (
-          <Button disabled className="gap-1.5">
-            <CheckCircle2 className="h-4 w-4" />
-            All Pushed
-          </Button>
-        ) : (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                disabled={selectedPushable.length === 0}
-                className={cn(
-                  "gap-1.5",
-                  selectedPushable.length > 0 && "bg-figma-orange hover:bg-figma-orange-hover text-white"
-                )}
-              >
-                Push {selectedPushable.length > 0 ? `${selectedPushable.length} ` : ""}Rate{selectedPushable.length !== 1 ? "s" : ""}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Push rates to estimating?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will transfer {selectedPushable.length} production rate{selectedPushable.length !== 1 ? "s" : ""} to the
-                  estimating database. This action informs future bid accuracy.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-figma-orange hover:bg-figma-orange-hover text-white"
-                  onClick={handlePush}
-                >
-                  Push Rates
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+      {/* STICKY FOOTER */}
+      <div className="shrink-0 bg-white border-t-2">
+        {/* Estimating Database results */}
+        {estimatingDatabase.length > 0 && (
+          <div className="px-6 py-3 border-b bg-green-50/30" style={{ borderColor: "var(--figma-bg-outline)" }}>
+            <div className="flex items-center gap-2 mb-2">
+              <Database className="h-3.5 w-3.5 text-green-700" />
+              <span className="text-xs font-semibold text-green-800">Estimating Database</span>
+              <span className="text-[10px] text-green-700">Rates available for future bids</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {estimatingDatabase.map((record) => (
+                <span key={record.wbs_code} className="inline-flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-50 px-2.5 py-1 text-xs">
+                  <span className="text-green-800">{record.description}</span>
+                  <span className="font-mono font-semibold text-green-700">{record.final_rate.toFixed(4)} MH/{record.uom}</span>
+                </span>
+              ))}
+            </div>
+          </div>
         )}
-      </div>
 
-      {/* Estimating Database results (shown when any records exist) */}
-      {estimatingDatabase.length > 0 && (
-        <div className="mt-6 rounded-lg border border-green-200 bg-green-50/50 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Database className="h-4 w-4 text-green-800" />
-            <h3 className="text-sm font-semibold text-green-800">
-              Estimating Database (Mock)
-            </h3>
-            <span className="text-xs text-green-700">
-              These rates are now available for future bids
-            </span>
+        {/* Action bar */}
+        <div className="px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Database className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              {allPushed
+                ? "All rates transferred to estimating database."
+                : selectedPushable.length > 0
+                ? `${selectedPushable.length} code${selectedPushable.length !== 1 ? "s" : ""} selected to push.`
+                : `${pushableItems.length} code${pushableItems.length !== 1 ? "s" : ""} with production data ready to push.`}
+            </p>
           </div>
-          <div className="space-y-2">
-            {estimatingDatabase.map((record) => (
-              <div
-                key={record.wbs_code}
-                className="flex items-center justify-between text-sm"
-              >
-                <span className="text-green-800">{record.description}</span>
-                <Badge
-                  variant="outline"
-                  className="font-mono border-green-500 text-green-700"
+          {allPushed ? (
+            <Button disabled className="gap-1.5 h-8 text-xs">
+              <CheckCircle2 className="h-3.5 w-3.5" />All Pushed
+            </Button>
+          ) : (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={selectedPushable.length === 0}
+                  className="gap-1.5 h-8 text-xs"
+                  style={selectedPushable.length > 0 ? { backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" } : undefined}
                 >
-                  {record.final_rate.toFixed(4)} MH/{record.uom}
-                </Badge>
-              </div>
-            ))}
-          </div>
+                  Push {selectedPushable.length > 0 ? `${selectedPushable.length} ` : ""}Rate{selectedPushable.length !== 1 ? "s" : ""}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Push rates to estimating?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will transfer {selectedPushable.length} production rate{selectedPushable.length !== 1 ? "s" : ""} to the
+                    estimating database. This action informs future bid accuracy.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}
+                    onClick={handlePush}
+                  >
+                    Push Rates
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

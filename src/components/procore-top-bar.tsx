@@ -35,8 +35,8 @@ export function ProcoreTopBar() {
           <Badge
             className="text-[10px] h-5 border-0"
             style={{
-              backgroundColor: projectMetadata.status === "Active" ? "rgba(21, 128, 61, 0.2)" : "rgba(255,255,255,0.1)",
-              color: projectMetadata.status === "Active" ? "#4ade80" : "var(--figma-topbar-text-muted)",
+              backgroundColor: projectMetadata.status === "Active" ? "rgba(21, 128, 61, 0.15)" : "rgba(255,255,255,0.1)",
+              color: projectMetadata.status === "Active" ? "var(--figma-success)" : "var(--figma-topbar-text-muted)",
             }}
           >
             {projectMetadata.status}

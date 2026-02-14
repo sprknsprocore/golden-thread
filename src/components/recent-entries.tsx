@@ -88,7 +88,7 @@ export function RecentEntries({ date, wbsCode }: RecentEntriesProps) {
         <div className="border-t">
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-muted/20">
+              <tr className="bg-muted/10">
                 {!wbsCode && <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Code</th>}
                 <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Hours</th>
                 <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Qty</th>
@@ -103,7 +103,7 @@ export function RecentEntries({ date, wbsCode }: RecentEntriesProps) {
                 const isEditing = editingId === entry.id;
 
                 return (
-                  <tr key={entry.id} className="border-t">
+                  <tr key={entry.id} className="border-t h-10">
                     {!wbsCode && (
                       <td className="px-2 py-1.5">
                         <span className="font-medium">{getDescription(entry.wbs_code)}</span>
