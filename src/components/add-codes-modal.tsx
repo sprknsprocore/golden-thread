@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { Search, X } from "lucide-react";
+import { Search, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useProductionStore, type Assembly } from "@/store/use-production-store";
+import { CodeCreatorModal } from "@/components/code-creator-modal";
 import { cn } from "@/lib/utils";
 
 interface AddCodesModalProps {
@@ -26,6 +27,7 @@ export function AddCodesModal({ open, onOpenChange }: AddCodesModalProps) {
     useProductionStore();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [showCreator, setShowCreator] = useState(false);
 
   // Assemblies not already in the provisional list
   const available = useMemo(
@@ -142,20 +144,29 @@ export function AddCodesModal({ open, onOpenChange }: AddCodesModalProps) {
               </label>
             ))}
             {filtered.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-6">
-                {available.length === 0
-                  ? "All codes are already added."
-                  : "No codes match your search."}
-              </p>
+              <div className="text-center py-6 space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  {available.length === 0
+                    ? "All codes are already added."
+                    : "No codes match your search."}
+                </p>
+                {available.length === 0 && (
+                  <Button variant="outline" size="sm" onClick={() => setShowCreator(true)}>
+                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    Create New Code
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         </div>
 
         {/* Footer */}
         <DialogFooter className="flex items-center justify-between sm:justify-between">
-          <span className="text-xs text-muted-foreground">
-            {selected.size} code{selected.size !== 1 ? "s" : ""} selected
-          </span>
+          <Button variant="ghost" size="sm" onClick={() => setShowCreator(true)}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Create new
+          </Button>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleClose}>
               Cancel
@@ -170,6 +181,8 @@ export function AddCodesModal({ open, onOpenChange }: AddCodesModalProps) {
           </div>
         </DialogFooter>
       </DialogContent>
+
+      <CodeCreatorModal open={showCreator} onOpenChange={setShowCreator} />
     </Dialog>
   );
 }

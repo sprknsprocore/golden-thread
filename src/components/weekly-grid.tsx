@@ -16,10 +16,19 @@ import {
   Filter,
   MessageSquare,
   Wrench,
+  PanelRightClose,
+  PanelRightOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { ClaimingSubGrid } from "@/components/claiming-sub-grid";
 import { AddCodesModal } from "@/components/add-codes-modal";
 import { MaterialDrawdown } from "@/components/material-drawdown";
@@ -109,6 +118,7 @@ const W = {
   pf: 64,
   action: 48,
 } as const;
+const TABLE_MIN_W = W.code + 10 * W.cell + 2 * W.cell + W.pf + W.action;
 
 /* Colgroup — renders identical <colgroup> for both main table and footer */
 function ColDefs() {
@@ -190,11 +200,12 @@ export function WeeklyGrid() {
   const [equipDrafts, setEquipDrafts] = useState<EquipDraft>({});
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [noteRows, setNoteRows] = useState<Set<string>>(new Set());
+  const [noteModalCode, setNoteModalCode] = useState<string | null>(null);
   const [claimingDrafts, setClaimingDrafts] = useState<
     Record<string, ClaimingProgress[]>
   >({});
   const [showAddCodes, setShowAddCodes] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const [saved, setSaved] = useState(false);
 
   const weekDays = useMemo(() => getWeekDays(mondayDate), [mondayDate]);
@@ -207,6 +218,14 @@ export function WeeklyGrid() {
         .filter(Boolean),
     [provisionalCodes, assemblies]
   );
+
+  const relevantMaterials = useMemo(() => {
+    const items = new Set<string>();
+    for (const a of provisionalAssemblies) {
+      if (a?.materials) for (const m of a.materials) items.add(m.item);
+    }
+    return items;
+  }, [provisionalAssemblies]);
 
   /* ---------- Committed data ---------- */
 
@@ -250,7 +269,7 @@ export function WeeklyGrid() {
     setDrafts({});
     setEquipDrafts({});
     setNotesDraft({});
-    setNoteRows(new Set());
+    setNoteModalCode(null);
     setSaved(false);
   };
 
@@ -302,14 +321,6 @@ export function WeeklyGrid() {
       else n.add(code);
       return n;
     });
-  const toggleNote = (code: string) =>
-    setNoteRows((prev) => {
-      const n = new Set(prev);
-      if (n.has(code)) n.delete(code);
-      else n.add(code);
-      return n;
-    });
-
   /* ---------- Row totals ---------- */
 
   const getRowTotals = useCallback(
@@ -361,7 +372,7 @@ export function WeeklyGrid() {
     setDrafts({});
     setEquipDrafts({});
     setNotesDraft({});
-    setNoteRows(new Set());
+    setNoteModalCode(null);
     setClaimingDrafts({});
     setSaved(true);
     toast.success(`${count} entr${count === 1 ? "y" : "ies"} saved`);
@@ -504,6 +515,19 @@ export function WeeklyGrid() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            className={cn(
+              "hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors",
+              showSidebar
+                ? "bg-neutral-800 text-white border-neutral-800 hover:bg-neutral-700"
+                : "bg-white text-muted-foreground border hover:bg-muted/30"
+            )}
+            style={showSidebar ? undefined : { borderColor: "var(--figma-bg-outline)" }}
+            onClick={() => setShowSidebar((v) => !v)}
+          >
+            {showSidebar ? <PanelRightClose className="h-3.5 w-3.5" /> : <PanelRightOpen className="h-3.5 w-3.5" />}
+            Inventory
+          </button>
           <Button
             variant="outline"
             size="sm"
@@ -537,14 +561,14 @@ export function WeeklyGrid() {
         <div className="flex-1 flex flex-col min-w-0">
           {/* Scrollable table */}
           <div className="flex-1 overflow-auto">
-            <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
+            <table className="border-collapse" style={{ tableLayout: "fixed", minWidth: TABLE_MIN_W }}>
               <ColDefs />
 
               {/* ===== HEADER ===== */}
               <thead className="sticky top-0 z-10">
                 {/* Row 1: Day names + dates */}
-                <tr className="bg-muted/10 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                  <th className="sticky left-0 z-20 bg-muted/10 text-left px-4 py-2.5 text-xs font-semibold text-foreground border-r" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                <tr className="bg-neutral-50 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                  <th className="sticky left-0 z-20 bg-neutral-50 text-left px-4 py-2.5 text-xs font-semibold text-foreground border-r" style={{ borderColor: "var(--figma-bg-outline)" }}>
                     Code / Description
                   </th>
                   {weekDays.map((day, i) => (
@@ -566,21 +590,24 @@ export function WeeklyGrid() {
                     </th>
                   ))}
                   <th
-                    colSpan={2}
-                    className="text-center py-2.5 border-l-2 bg-muted/15"
-                    style={{ borderColor: "var(--figma-bg-outline)" }}
+                    className="sticky z-20 bg-neutral-100 text-center py-2.5 border-l-2"
+                    style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }}
                   >
                     <div className="text-xs font-semibold">Total</div>
                   </th>
-                  <th className="text-center py-2.5 text-xs font-semibold border-l" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                  <th
+                    className="sticky z-20 bg-neutral-100 py-2.5"
+                    style={{ right: W.pf + W.action }}
+                  />
+                  <th className="sticky z-20 bg-neutral-100 text-center py-2.5 text-xs font-semibold border-l" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }}>
                     PF
                   </th>
-                  <th className="py-2.5" />
+                  <th className="sticky right-0 z-20 bg-neutral-100 py-2.5" />
                 </tr>
 
                 {/* Row 2: Hours / Units sub-headers */}
-                <tr className="bg-muted/10 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                  <th className="sticky left-0 z-20 bg-muted/10 border-r" style={{ borderColor: "var(--figma-bg-outline)" }} />
+                <tr className="bg-neutral-50 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                  <th className="sticky left-0 z-20 bg-neutral-50 border-r" style={{ borderColor: "var(--figma-bg-outline)" }} />
                   {weekDays.map((_, i) => (
                     <React.Fragment key={`sub-${dateKeys[i]}`}>
                       <th
@@ -602,14 +629,14 @@ export function WeeklyGrid() {
                       </th>
                     </React.Fragment>
                   ))}
-                  <th className="text-center py-1.5 text-[10px] text-muted-foreground font-medium tracking-wider uppercase border-l-2 bg-muted/15" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                  <th className="sticky z-20 bg-neutral-100 text-center py-1.5 text-[10px] text-muted-foreground font-medium tracking-wider uppercase border-l-2" style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }}>
                     Hrs
                   </th>
-                  <th className="text-center py-1.5 text-[10px] text-muted-foreground font-medium tracking-wider uppercase bg-muted/15">
+                  <th className="sticky z-20 bg-neutral-100 text-center py-1.5 text-[10px] text-muted-foreground font-medium tracking-wider uppercase" style={{ right: W.pf + W.action }}>
                     Qty
                   </th>
-                  <th className="border-l" style={{ borderColor: "var(--figma-bg-outline)" }} />
-                  <th />
+                  <th className="sticky z-20 bg-neutral-100 border-l" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }} />
+                  <th className="sticky right-0 z-20 bg-neutral-100" />
                 </tr>
               </thead>
 
@@ -625,7 +652,6 @@ export function WeeklyGrid() {
                     ? claimingSchemas[assembly.claiming_schema_id!]
                     : null;
                   const isExpanded = expandedRows.has(assembly.wbs_code);
-                  const isNoteOpen = noteRows.has(assembly.wbs_code);
                   const rowTotals = getRowTotals(assembly.wbs_code);
                   const rowNote = notesDraft[assembly.wbs_code] ?? "";
                   const existingNotes = productionEvents
@@ -771,7 +797,7 @@ export function WeeklyGrid() {
                         })}
 
                         {/* Total Hours */}
-                        <td className="border-l-2 text-center py-2 bg-muted/10 align-middle" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                        <td className="sticky z-10 bg-neutral-50 group-hover:bg-sky-50/60 transition-colors border-l-2 text-center py-2 align-middle" style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }}>
                           <span className="text-sm font-mono font-semibold">
                             {rowTotals.totalHours > 0
                               ? rowTotals.totalHours.toFixed(1)
@@ -779,7 +805,7 @@ export function WeeklyGrid() {
                           </span>
                         </td>
                         {/* Total Units */}
-                        <td className="text-center py-2 bg-muted/10 align-middle">
+                        <td className="sticky z-10 bg-neutral-50 group-hover:bg-sky-50/60 transition-colors text-center py-2 align-middle" style={{ right: W.pf + W.action }}>
                           <span className="text-sm font-mono font-semibold">
                             {rowTotals.totalUnits > 0
                               ? rowTotals.totalUnits.toFixed(1)
@@ -788,23 +814,21 @@ export function WeeklyGrid() {
                         </td>
 
                         {/* PF */}
-                        <td className="text-center border-l align-middle" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                        <td className="sticky z-10 bg-neutral-50 group-hover:bg-sky-50/60 transition-colors text-center border-l align-middle" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }}>
                           <PFBadge pf={pf} hasData={agg.totalHours > 0} />
                         </td>
 
                         {/* Notes */}
-                        <td className="text-center align-middle">
+                        <td className="sticky right-0 z-10 bg-neutral-50 group-hover:bg-sky-50/60 transition-colors text-center align-middle">
                           <button
-                            onClick={() =>
-                              toggleNote(assembly.wbs_code)
-                            }
+                            onClick={() => setNoteModalCode(assembly.wbs_code)}
                             className={cn(
                               "p-1.5 rounded transition-colors",
-                              isNoteOpen || rowNote || latestNote
+                              rowNote || latestNote
                                 ? "text-primary hover:bg-primary/10"
                                 : "text-muted-foreground/30 hover:text-muted-foreground hover:bg-muted/30"
                             )}
-                            title="Toggle notes"
+                            title="Add note"
                           >
                             <MessageSquare className="h-4 w-4" />
                           </button>
@@ -875,52 +899,17 @@ export function WeeklyGrid() {
                             </React.Fragment>
                           );
                         })}
-                        <td className="border-l-2 bg-muted/10" style={{ borderColor: "var(--figma-bg-outline)" }} />
-                        <td className="bg-muted/10" />
-                        <td className="border-l" style={{ borderColor: "var(--figma-bg-outline)" }} />
-                        <td />
+                        <td className="sticky z-10 bg-neutral-50 border-l-2" style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }} />
+                        <td className="sticky z-10 bg-neutral-50" style={{ right: W.pf + W.action }} />
+                        <td className="sticky z-10 bg-neutral-50 border-l" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }} />
+                        <td className="sticky right-0 z-10 bg-neutral-50" />
                       </tr>
-
-                      {/* ======== NOTES ROW ======== */}
-                      {isNoteOpen && (
-                        <tr className="border-b bg-muted/[0.03]" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                          <td colSpan={15} className="px-4 py-3">
-                            <div className="flex items-start gap-3 max-w-2xl pl-6">
-                              <MessageSquare className="h-4 w-4 text-muted-foreground mt-1 shrink-0" />
-                              <div className="flex-1 space-y-1">
-                                {latestNote && !rowNote && (
-                                  <p className="text-[11px] text-muted-foreground italic">
-                                    Previous: {latestNote}
-                                  </p>
-                                )}
-                                <Textarea
-                                  placeholder="Variance notes, constraints, field conditions..."
-                                  maxLength={255}
-                                  value={rowNote}
-                                  onChange={(e) => {
-                                    setNotesDraft((prev) => ({
-                                      ...prev,
-                                      [assembly.wbs_code]: e.target.value,
-                                    }));
-                                    setSaved(false);
-                                  }}
-                                  className="text-sm resize-none min-h-[56px] bg-white"
-                                  rows={2}
-                                />
-                                <p className="text-[11px] text-muted-foreground text-right">
-                                  {(rowNote || "").length}/255
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-
                       {/* ======== CLAIMING SUB-GRID ======== */}
                       {isExpanded && hasSchema && schema && (
                         <tr className="border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
                           <td colSpan={15} className="bg-gradient-to-b from-muted/[0.06] to-transparent">
-                            <div className="px-6 py-5 max-w-3xl ml-6">
+                            <div className="sticky left-0 w-fit">
+                              <div className="px-6 py-5 max-w-3xl ml-6">
                               <ClaimingSubGrid
                                 schema={schema}
                                 progress={
@@ -934,6 +923,7 @@ export function WeeklyGrid() {
                                 }
                               />
                             </div>
+                          </div>
                           </td>
                         </tr>
                       )}
@@ -978,19 +968,18 @@ export function WeeklyGrid() {
                   </tr>
                 )}
               </tbody>
-            </table>
-          </div>
+          </table>
 
           {/* ===== STICKY FOOTER — totals ===== */}
           {provisionalAssemblies.length > 0 && (
-            <div className="shrink-0 bg-white border-t-2" style={{ borderColor: "var(--figma-bg-outline)" }}>
-              <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
+            <div className="sticky bottom-0 z-10 bg-white border-t-2" style={{ borderColor: "var(--figma-bg-outline)" }}>
+              <table className="border-collapse" style={{ tableLayout: "fixed", minWidth: TABLE_MIN_W }}>
                 <ColDefs />
                 <tbody>
                   {/* Logged This Week */}
                   {weekHasCommitted && (
-                    <tr className="h-10 bg-muted/10 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                      <td className="px-4 text-xs font-semibold text-muted-foreground">
+                    <tr className="h-10 bg-neutral-50 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                      <td className="sticky left-0 z-20 bg-neutral-50 px-4 text-xs font-semibold text-muted-foreground border-r" style={{ width: W.code, borderColor: "var(--figma-bg-outline)" }}>
                         Logged This Week
                       </td>
                       {committedPerDay.map((hrs, i) => (
@@ -1009,26 +998,26 @@ export function WeeklyGrid() {
                           <td className={dayBg(i)} />
                         </React.Fragment>
                       ))}
-                      <td className="text-center border-l-2 bg-muted/15" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                        <span className="text-xs font-mono font-semibold text-muted-foreground">
-                          {committedPerDay.reduce((a, b) => a + b, 0) > 0
-                            ? committedPerDay
-                                .reduce((a, b) => a + b, 0)
-                                .toFixed(1)
-                            : ""}
-                        </span>
-                      </td>
-                      <td className="bg-muted/15" />
-                      <td className="border-l" style={{ borderColor: "var(--figma-bg-outline)" }} />
-                      <td />
+                    <td className="sticky z-20 bg-neutral-100 text-center border-l-2" style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }}>
+                      <span className="text-xs font-mono font-semibold text-muted-foreground">
+                        {committedPerDay.reduce((a, b) => a + b, 0) > 0
+                          ? committedPerDay
+                              .reduce((a, b) => a + b, 0)
+                              .toFixed(1)
+                          : ""}
+                      </span>
+                    </td>
+                    <td className="sticky z-20 bg-neutral-100" style={{ right: W.pf + W.action }} />
+                      <td className="sticky z-20 bg-neutral-100 border-l" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }} />
+                      <td className="sticky right-0 z-20 bg-neutral-100" />
                     </tr>
                   )}
 
                   {/* Avg Daily Budget */}
-                  <tr className="h-10 bg-muted/15 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                    <td className="px-4 text-xs font-semibold text-muted-foreground">
-                      Avg Daily Budget
-                    </td>
+                <tr className="h-10 bg-neutral-50 border-b" style={{ borderColor: "var(--figma-bg-outline)" }}>
+                  <td className="sticky left-0 z-20 bg-neutral-50 px-4 text-xs font-semibold text-muted-foreground border-r" style={{ width: W.code, borderColor: "var(--figma-bg-outline)" }}>
+                    Avg Daily Budget
+                  </td>
                     {allocatedPerDay.map((alloc, i) => (
                       <React.Fragment key={`falloc-${dateKeys[i]}`}>
                         <td
@@ -1042,21 +1031,21 @@ export function WeeklyGrid() {
                         <td />
                       </React.Fragment>
                     ))}
-                    <td className="text-center border-l-2 bg-muted/20" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                      <span className="text-xs font-mono font-semibold text-muted-foreground">
-                        {allocatedPerDay.reduce((a, b) => a + b, 0).toFixed(0)}
-                      </span>
-                    </td>
-                    <td className="bg-muted/20" />
-                    <td className="border-l" style={{ borderColor: "var(--figma-bg-outline)" }} />
-                    <td />
+                  <td className="sticky z-20 bg-neutral-100 text-center border-l-2" style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }}>
+                    <span className="text-xs font-mono font-semibold text-muted-foreground">
+                      {allocatedPerDay.reduce((a, b) => a + b, 0).toFixed(0)}
+                    </span>
+                  </td>
+                  <td className="sticky z-20 bg-neutral-100" style={{ right: W.pf + W.action }} />
+                    <td className="sticky z-20 bg-neutral-100 border-l" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }} />
+                    <td className="sticky right-0 z-20 bg-neutral-100" />
                   </tr>
 
                   {/* Timecards Total */}
-                  <tr className="h-10 bg-muted/25">
-                    <td className="px-4 text-xs font-semibold">
-                      Timecards Total
-                    </td>
+                <tr className="h-10 bg-neutral-100">
+                  <td className="sticky left-0 z-20 bg-neutral-100 px-4 text-xs font-semibold border-r" style={{ width: W.code, borderColor: "var(--figma-bg-outline)" }}>
+                    Timecards Total
+                  </td>
                     {timecardPerDay.map((tc, i) => (
                       <React.Fragment key={`ftc-${dateKeys[i]}`}>
                         <td
@@ -1079,40 +1068,93 @@ export function WeeklyGrid() {
                         <td />
                       </React.Fragment>
                     ))}
-                    <td className="text-center border-l-2 bg-muted/30" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                      <span
-                        className={cn(
-                          "text-xs font-mono font-semibold",
-                          timecardPerDay.some((t) => t > 0)
-                            ? "text-foreground"
-                            : "text-muted-foreground"
-                        )}
-                      >
-                        {timecardPerDay.reduce((a, b) => a + b, 0) > 0
-                          ? timecardPerDay
-                              .reduce((a, b) => a + b, 0)
-                              .toFixed(0)
-                          : ""}
-                      </span>
-                    </td>
-                    <td className="bg-muted/30" />
-                    <td className="border-l" style={{ borderColor: "var(--figma-bg-outline)" }} />
-                    <td />
+                  <td className="sticky z-20 bg-neutral-200 text-center border-l-2" style={{ right: W.pf + W.action + W.cell, borderColor: "var(--figma-bg-outline)", boxShadow: "-4px 0 8px -4px rgba(0,0,0,0.06)" }}>
+                    <span
+                      className={cn(
+                        "text-xs font-mono font-semibold",
+                        timecardPerDay.some((t) => t > 0)
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      {timecardPerDay.reduce((a, b) => a + b, 0) > 0
+                        ? timecardPerDay
+                            .reduce((a, b) => a + b, 0)
+                            .toFixed(0)
+                        : ""}
+                    </span>
+                  </td>
+                  <td className="sticky z-20 bg-neutral-200" style={{ right: W.pf + W.action }} />
+                    <td className="sticky z-20 bg-neutral-200 border-l" style={{ right: W.action, borderColor: "var(--figma-bg-outline)" }} />
+                    <td className="sticky right-0 z-20 bg-neutral-200" />
                   </tr>
                 </tbody>
               </table>
             </div>
           )}
         </div>
+        </div>
 
         {/* Sidebar — Material Drawdown */}
         <div
-          className="hidden xl:block w-[280px] shrink-0 border-l overflow-y-auto p-4"
-          style={{ borderColor: "var(--figma-bg-outline)" }}
+          className={cn(
+            "hidden xl:block shrink-0 border-l overflow-hidden transition-[width] duration-200 ease-in-out",
+            showSidebar ? "w-[280px]" : "w-0 border-l-0"
+          )}
+          style={{ borderColor: showSidebar ? "var(--figma-bg-outline)" : "transparent" }}
         >
-          <MaterialDrawdown pendingDrawdowns={pendingDrawdowns} />
+          <div className="w-[280px] h-full overflow-y-auto p-4">
+            <MaterialDrawdown pendingDrawdowns={pendingDrawdowns} relevantItems={relevantMaterials} />
+          </div>
         </div>
       </div>
+
+      {/* ======== NOTES MODAL ======== */}
+      <Dialog open={noteModalCode !== null} onOpenChange={(open) => { if (!open) setNoteModalCode(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Variance Notes</DialogTitle>
+            {noteModalCode && (
+              <DialogDescription>
+                {assemblies.find((a) => a.wbs_code === noteModalCode)?.description}
+                <span className="font-mono text-[11px] ml-1.5 opacity-60">{noteModalCode}</span>
+              </DialogDescription>
+            )}
+          </DialogHeader>
+          {noteModalCode && (() => {
+            const draft = notesDraft[noteModalCode] ?? "";
+            const prev = productionEvents
+              .filter((e) => e.wbs_code === noteModalCode && e.description)
+              .map((e) => e.description)
+              .filter(Boolean)
+              .at(-1) ?? "";
+            return (
+              <div className="space-y-3">
+                {prev && !draft && (
+                  <p className="text-sm text-muted-foreground italic">
+                    Previous: {prev}
+                  </p>
+                )}
+                <Textarea
+                  placeholder="Variance notes, constraints, field conditions..."
+                  maxLength={255}
+                  value={draft}
+                  onChange={(e) => {
+                    setNotesDraft((p) => ({ ...p, [noteModalCode]: e.target.value }));
+                    setSaved(false);
+                  }}
+                  className="text-sm resize-none min-h-[80px]"
+                  rows={3}
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                  {draft.length}/255
+                </p>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       <AddCodesModal open={showAddCodes} onOpenChange={setShowAddCodes} />
     </>

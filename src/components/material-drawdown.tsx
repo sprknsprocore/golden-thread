@@ -20,12 +20,17 @@ interface PendingDrawdown {
 
 interface MaterialDrawdownProps {
   pendingDrawdowns?: PendingDrawdown[];
+  relevantItems?: Set<string>;
 }
 
-export function MaterialDrawdown({ pendingDrawdowns = [] }: MaterialDrawdownProps) {
+export function MaterialDrawdown({ pendingDrawdowns = [], relevantItems }: MaterialDrawdownProps) {
   const { mockInventory } = useProductionStore();
 
   const originals = seedData.mock_inventory;
+
+  const visibleInventory = relevantItems
+    ? mockInventory.filter((i) => relevantItems.has(i.item))
+    : mockInventory;
 
   return (
     <Card>
@@ -35,16 +40,16 @@ export function MaterialDrawdown({ pendingDrawdowns = [] }: MaterialDrawdownProp
           Material Inventory
         </CardTitle>
         <CardDescription>
-          Real-time stockroom drawdown as production events are logged
+          Remaining stock for active work items
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {mockInventory.length === 0 && (
+        {visibleInventory.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">
             No inventory items tracked for this project.
           </p>
         )}
-        {mockInventory.map((item) => {
+        {visibleInventory.map((item) => {
           const original = originals.find((o) => o.item === item.item);
           const originalQty = original?.on_hand ?? item.on_hand;
 
@@ -60,17 +65,17 @@ export function MaterialDrawdown({ pendingDrawdowns = [] }: MaterialDrawdownProp
 
           const statusColor =
             pctRemaining > 50
-              ? "text-teal-600"
+              ? "text-neutral-900"
               : pctRemaining > 20
-              ? "text-amber-600"
-              : "text-red-600";
+              ? "text-neutral-500"
+              : "text-neutral-400";
 
           const barColor =
             pctRemaining > 50
-              ? "[&>div]:bg-teal-400"
+              ? "[&>div]:bg-neutral-900"
               : pctRemaining > 20
-              ? "[&>div]:bg-amber-400"
-              : "[&>div]:bg-red-400";
+              ? "[&>div]:bg-neutral-500"
+              : "[&>div]:bg-neutral-400";
 
           return (
             <div key={item.item} className="space-y-1.5">
@@ -85,7 +90,7 @@ export function MaterialDrawdown({ pendingDrawdowns = [] }: MaterialDrawdownProp
                 {pctRemaining.toFixed(0)}% remaining of{" "}
                 {originalQty.toLocaleString()} {item.uom}
                 {pendingQty > 0 && (
-                  <span className="text-amber-600 ml-1">
+                  <span className="text-neutral-500 ml-1">
                     ({pendingQty.toLocaleString()} pending)
                   </span>
                 )}

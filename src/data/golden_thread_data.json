@@ -104,6 +104,271 @@
         { "id": "comp_4", "name": "CIP Concrete",  "plan_qty": 16, "uom": "SQFT", "budgeted_hours": 14 },
         { "id": "comp_5", "name": "Cleanup",       "plan_qty": 16, "uom": "SQFT", "budgeted_hours": 8  }
       ]
+    },
+    {
+      "wbs_code": "02-210.EX",
+      "description": "Mass Excavation - Court Subgrade",
+      "budgeted_qty": 1450,
+      "uom": "CY",
+      "budgeted_hours": 96,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 8.75,
+      "crew_template": [
+        { "role": "Operator", "count": 2 },
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": [],
+      "equipment": [
+        { "name": "CAT D6 Dozer", "type": "Dozer" },
+        { "name": "CAT 320 Excavator", "type": "Excavator" },
+        { "name": "Volvo A30 Haul Truck", "type": "Haul Truck" }
+      ]
+    },
+    {
+      "wbs_code": "02-220.GR",
+      "description": "Fine Grading & Compaction",
+      "budgeted_qty": 21600,
+      "uom": "SF",
+      "budgeted_hours": 72,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 1.20,
+      "crew_template": [
+        { "role": "Operator", "count": 1 },
+        { "role": "Laborer", "count": 3 }
+      ],
+      "materials": [],
+      "equipment": [
+        { "name": "CAT 140 Motor Grader", "type": "Grader" },
+        { "name": "Bomag BW120 Roller", "type": "Compactor" }
+      ]
+    },
+    {
+      "wbs_code": "02-510.SD",
+      "description": "4-inch Perforated Subdrain",
+      "budgeted_qty": 820,
+      "uom": "LF",
+      "budgeted_hours": 64,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 18.50,
+      "crew_template": [
+        { "role": "Pipe Layer", "count": 2 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "4\" Perf HDPE Pipe", "qty_required": 820, "uom": "LF" },
+        { "item": "Filter Fabric", "qty_required": 920, "uom": "SY" },
+        { "item": "Drainage Aggregate #57", "qty_required": 145, "uom": "TON" }
+      ]
+    },
+    {
+      "wbs_code": "02-740.CB",
+      "description": "Precast Catch Basins",
+      "budgeted_qty": 6,
+      "uom": "EA",
+      "budgeted_hours": 48,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 2850.00,
+      "crew_template": [
+        { "role": "Pipe Layer", "count": 2 },
+        { "role": "Operator", "count": 1 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "Precast CB 4x4", "qty_required": 6, "uom": "EA" },
+        { "item": "CB Frame & Grate", "qty_required": 6, "uom": "EA" }
+      ]
+    },
+    {
+      "wbs_code": "03-300.FTG",
+      "description": "Strip Footings - Net Posts & Fencing",
+      "budgeted_qty": 240,
+      "uom": "LF",
+      "budgeted_hours": 112,
+      "claiming_schema_id": "cs_002",
+      "blended_unit_cost": 62.00,
+      "crew_template": [
+        { "role": "Carpenter", "count": 2 },
+        { "role": "Ironworker", "count": 1 },
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": [
+        { "item": "#5 Rebar", "qty_required": 480, "uom": "LF" },
+        { "item": "Ready-Mix 4000 PSI", "qty_required": 36, "uom": "CY" }
+      ]
+    },
+    {
+      "wbs_code": "03-300.SOG",
+      "description": "Concrete Slab on Grade - Courts",
+      "budgeted_qty": 21600,
+      "uom": "SF",
+      "budgeted_hours": 640,
+      "claiming_schema_id": "cs_002",
+      "blended_unit_cost": 8.25,
+      "crew_template": [
+        { "role": "Carpenter", "count": 4 },
+        { "role": "Laborer", "count": 4 },
+        { "role": "Operator", "count": 1 }
+      ],
+      "materials": [
+        { "item": "Ready-Mix 4000 PSI", "qty_required": 400, "uom": "CY" },
+        { "item": "#4 Rebar", "qty_required": 2400, "uom": "LF" },
+        { "item": "6 mil Vapor Barrier", "qty_required": 24000, "uom": "SF" },
+        { "item": "Expansion Joint Filler", "qty_required": 680, "uom": "LF" }
+      ]
+    },
+    {
+      "wbs_code": "02-780.ABC",
+      "description": "Aggregate Base Course - 6 inch",
+      "budgeted_qty": 480,
+      "uom": "TON",
+      "budgeted_hours": 56,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 24.00,
+      "crew_template": [
+        { "role": "Operator", "count": 1 },
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": [
+        { "item": "Crushed Aggregate Base #53", "qty_required": 480, "uom": "TON" }
+      ]
+    },
+    {
+      "wbs_code": "09-910.AC",
+      "description": "Acrylic Court Surface System",
+      "budgeted_qty": 21600,
+      "uom": "SF",
+      "budgeted_hours": 240,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 3.50,
+      "crew_template": [
+        { "role": "Laborer", "count": 4 },
+        { "role": "Foreman", "count": 1 }
+      ],
+      "materials": [
+        { "item": "Acrylic Resurfacer", "qty_required": 110, "uom": "GAL" },
+        { "item": "Acrylic Color Coat", "qty_required": 220, "uom": "GAL" }
+      ]
+    },
+    {
+      "wbs_code": "09-910.LN",
+      "description": "Court Line Striping & Markings",
+      "budgeted_qty": 3200,
+      "uom": "LF",
+      "budgeted_hours": 32,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 2.75,
+      "crew_template": [
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": [
+        { "item": "Line Paint - White", "qty_required": 15, "uom": "GAL" }
+      ]
+    },
+    {
+      "wbs_code": "05-520.FN",
+      "description": "10-ft Chain Link Fencing",
+      "budgeted_qty": 1040,
+      "uom": "LF",
+      "budgeted_hours": 192,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 38.00,
+      "crew_template": [
+        { "role": "Ironworker", "count": 2 },
+        { "role": "Laborer", "count": 2 }
+      ],
+      "materials": [
+        { "item": "10-ft Chain Link Fabric", "qty_required": 1040, "uom": "LF" },
+        { "item": "Terminal Posts", "qty_required": 52, "uom": "EA" },
+        { "item": "Line Posts", "qty_required": 104, "uom": "EA" },
+        { "item": "Top Rail", "qty_required": 1040, "uom": "LF" }
+      ]
+    },
+    {
+      "wbs_code": "05-520.GT",
+      "description": "Fence Gates - 4-ft Single Swing",
+      "budgeted_qty": 8,
+      "uom": "EA",
+      "budgeted_hours": 24,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 450.00,
+      "crew_template": [
+        { "role": "Ironworker", "count": 1 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "4-ft Chain Link Gate", "qty_required": 8, "uom": "EA" }
+      ]
+    },
+    {
+      "wbs_code": "16-500.LP",
+      "description": "Court Lighting - LED Poles",
+      "budgeted_qty": 12,
+      "uom": "EA",
+      "budgeted_hours": 144,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 4200.00,
+      "crew_template": [
+        { "role": "Electrician", "count": 2 },
+        { "role": "Operator", "count": 1 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "30-ft Galvanized Light Pole", "qty_required": 12, "uom": "EA" },
+        { "item": "LED Fixture 1500W", "qty_required": 24, "uom": "EA" }
+      ],
+      "equipment": [
+        { "name": "Boom Crane 40-ton", "type": "Crane" }
+      ]
+    },
+    {
+      "wbs_code": "16-100.EC",
+      "description": "Electrical Conduit & Wiring",
+      "budgeted_qty": 1800,
+      "uom": "LF",
+      "budgeted_hours": 160,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 22.00,
+      "crew_template": [
+        { "role": "Electrician", "count": 2 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "2\" PVC Conduit", "qty_required": 1800, "uom": "LF" },
+        { "item": "#6 THHN Wire", "qty_required": 5400, "uom": "LF" }
+      ]
+    },
+    {
+      "wbs_code": "02-900.LS",
+      "description": "Landscape Restoration & Seeding",
+      "budgeted_qty": 8500,
+      "uom": "SF",
+      "budgeted_hours": 48,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 0.85,
+      "crew_template": [
+        { "role": "Laborer", "count": 3 }
+      ],
+      "materials": [
+        { "item": "Topsoil", "qty_required": 160, "uom": "CY" },
+        { "item": "Hydroseed Mix", "qty_required": 8500, "uom": "SF" }
+      ]
+    },
+    {
+      "wbs_code": "10-400.NP",
+      "description": "Tennis Net Post Assemblies",
+      "budgeted_qty": 12,
+      "uom": "EA",
+      "budgeted_hours": 36,
+      "claiming_schema_id": null,
+      "blended_unit_cost": 680.00,
+      "crew_template": [
+        { "role": "Ironworker", "count": 1 },
+        { "role": "Laborer", "count": 1 }
+      ],
+      "materials": [
+        { "item": "Round Net Post w/ Sleeve", "qty_required": 12, "uom": "EA" },
+        { "item": "Center Strap Anchor", "qty_required": 6, "uom": "EA" }
+      ]
     }
   ],
   "provisional_wbs_codes": [
@@ -116,7 +381,14 @@
     { "item": "RCP Pipe 12\"", "on_hand": 1000, "uom": "LF" },
     { "item": "RCP Pipe 30\"", "on_hand": 500, "uom": "LF" },
     { "item": "Clean Stone Base", "on_hand": 300, "uom": "TON" },
-    { "item": "Standard Cribs", "on_hand": 200, "uom": "EA" }
+    { "item": "Standard Cribs", "on_hand": 200, "uom": "EA" },
+    { "item": "Ready-Mix 4000 PSI", "on_hand": 0, "uom": "CY" },
+    { "item": "#4 Rebar", "on_hand": 3200, "uom": "LF" },
+    { "item": "#5 Rebar", "on_hand": 600, "uom": "LF" },
+    { "item": "Crushed Aggregate Base #53", "on_hand": 200, "uom": "TON" },
+    { "item": "10-ft Chain Link Fabric", "on_hand": 500, "uom": "LF" },
+    { "item": "2\" PVC Conduit", "on_hand": 900, "uom": "LF" },
+    { "item": "Acrylic Color Coat", "on_hand": 110, "uom": "GAL" }
   ],
   "workers": [
     { "id": "w_001", "name": "Mike Torres", "role": "Pipe Layer", "hourly_rate": 42.00 },
