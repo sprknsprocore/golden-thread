@@ -561,7 +561,7 @@ export function WeeklyGrid() {
         <div className="flex-1 flex flex-col min-w-0">
           {/* Scrollable table */}
           <div className="flex-1 overflow-auto">
-            <table className="border-collapse" style={{ tableLayout: "fixed", minWidth: TABLE_MIN_W }}>
+            <table className="border-collapse w-full" style={{ tableLayout: "fixed", minWidth: TABLE_MIN_W }}>
               <ColDefs />
 
               {/* ===== HEADER ===== */}
@@ -973,7 +973,7 @@ export function WeeklyGrid() {
           {/* ===== STICKY FOOTER — totals ===== */}
           {provisionalAssemblies.length > 0 && (
             <div className="sticky bottom-0 z-10 bg-white border-t-2" style={{ borderColor: "var(--figma-bg-outline)" }}>
-              <table className="border-collapse" style={{ tableLayout: "fixed", minWidth: TABLE_MIN_W }}>
+              <table className="border-collapse w-full" style={{ tableLayout: "fixed", minWidth: TABLE_MIN_W }}>
                 <ColDefs />
                 <tbody>
                   {/* Logged This Week */}
