@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   ClipboardList,
   Database,
   GitCompareArrows,
+  LayoutDashboard,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
@@ -313,9 +315,21 @@ export function CloseoutPanel() {
             </p>
           </div>
           {allPushed ? (
-            <Button disabled className="gap-1.5 h-8 text-xs">
-              <CheckCircle2 className="h-3.5 w-3.5" />All Pushed
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs h-8">
+                <Link href="/">
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  Back to Budget
+                </Link>
+              </Button>
+              <Button asChild size="sm" className="gap-1.5 text-xs h-8" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
+                <Link href="/analysis">
+                  <BarChart3 className="h-3.5 w-3.5" />
+                  View Analysis
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            </div>
           ) : (
             <AlertDialog>
               <AlertDialogTrigger asChild>

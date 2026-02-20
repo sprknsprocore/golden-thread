@@ -185,13 +185,13 @@ export function ClaimingSubGrid({
                 </div>
 
                 {/* Weight badge */}
-                <span className="shrink-0 inline-flex items-center rounded-full bg-muted/20 px-2 py-0.5 text-[10px] font-mono font-medium text-muted-foreground">
+                <span className="shrink-0 inline-flex items-center rounded-full bg-muted/20 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
                   {(step.weight * 100).toFixed(0)}% wt
                 </span>
 
                 {/* Status label */}
                 <span className={cn(
-                  "shrink-0 w-[72px] text-[10px] font-medium text-right",
+                  "shrink-0 w-[80px] text-xs font-medium text-right",
                   isComplete ? "text-green-600" : pct > 0 ? "text-primary" : "text-muted-foreground/50"
                 )}>
                   {weightedLabel(pct)}
@@ -203,7 +203,8 @@ export function ClaimingSubGrid({
                     type="number"
                     min={0}
                     max={100}
-                    value={pct}
+                    value={pct || ""}
+                    placeholder="0"
                     onChange={(e) =>
                       handleStepChange(step.name, Number(e.target.value))
                     }

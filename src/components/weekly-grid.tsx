@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Calendar,
   ChevronLeft,
@@ -11,6 +12,7 @@ import {
   Plus,
   Save,
   Search,
+  Settings,
   Filter,
   MessageSquare,
   Wrench,
@@ -142,16 +144,21 @@ interface CellInputProps {
   placeholder?: string;
   onChange: (v: string) => void;
   small?: boolean;
+  hasCommitted?: boolean;
 }
 
-function CellInput({ value, placeholder, onChange, small }: CellInputProps) {
+function CellInput({ value, placeholder, onChange, small, hasCommitted }: CellInputProps) {
   return (
     <input
       type="number"
       value={value}
       placeholder={placeholder ?? "–"}
       onChange={(e) => onChange(e.target.value)}
-      className={cn(cellInputBase, small && "h-7 text-xs")}
+      className={cn(
+        cellInputBase,
+        small && "h-7 text-xs",
+        hasCommitted && !value && "placeholder:text-foreground placeholder:opacity-100"
+      )}
     />
   );
 }
@@ -378,6 +385,29 @@ export function WeeklyGrid() {
       }
     return false;
   }, [drafts, equipDrafts]);
+
+  const pendingDrawdowns = useMemo(() => {
+    const drawdowns: { item: string; qty: number }[] = [];
+    for (const assembly of provisionalAssemblies) {
+      if (!assembly) continue;
+      let totalDraftUnits = 0;
+      for (const dk of dateKeys) {
+        const cell = drafts[assembly.wbs_code]?.[dk];
+        if (cell) totalDraftUnits += parseFloat(cell.units) || 0;
+      }
+      if (totalDraftUnits > 0) {
+        const d = calcMaterialDrawdown(assembly, totalDraftUnits);
+        drawdowns.push(...d);
+      }
+    }
+    const merged: { item: string; qty: number }[] = [];
+    for (const d of drawdowns) {
+      const existing = merged.find((m) => m.item === d.item);
+      if (existing) existing.qty += d.qty;
+      else merged.push({ ...d });
+    }
+    return merged;
+  }, [provisionalAssemblies, dateKeys, drafts]);
 
   const allocatedPerDay = useMemo(() => {
     const daily =
@@ -700,6 +730,7 @@ export function WeeklyGrid() {
                                       ? committed.hours.toFixed(1)
                                       : "–"
                                   }
+                                  hasCommitted={committed.hours > 0}
                                   onChange={(v) =>
                                     setCell(
                                       assembly.wbs_code,
@@ -724,6 +755,7 @@ export function WeeklyGrid() {
                                       ? committed.units.toFixed(1)
                                       : "–"
                                   }
+                                  hasCommitted={committed.units > 0}
                                   onChange={(v) =>
                                     setCell(
                                       assembly.wbs_code,
@@ -785,10 +817,26 @@ export function WeeklyGrid() {
                         style={{ borderColor: "color-mix(in srgb, var(--figma-bg-outline) 50%, transparent)" }}
                       >
                         <td className="sticky left-0 z-10 bg-white px-4 py-1 border-r" style={{ borderColor: "var(--figma-bg-outline)" }}>
-                          <span className="text-[11px] text-muted-foreground flex items-center gap-1.5 pl-6">
-                            <Wrench className="h-3 w-3" />
-                            Equipment Hrs
-                          </span>
+                          <div className="flex items-start gap-1.5 pl-6">
+                            <Wrench className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
+                            <div className="min-w-0">
+                              <span className="text-[11px] text-muted-foreground">
+                                Equipment Hrs
+                              </span>
+                              {assembly.equipment && assembly.equipment.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {assembly.equipment.map((eq) => (
+                                    <span
+                                      key={eq.name}
+                                      className="inline-flex items-center rounded bg-muted/30 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                                    >
+                                      {eq.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </td>
                         {dateKeys.map((dk, dayIdx) => {
                           const ce = getCommitted(
@@ -812,6 +860,7 @@ export function WeeklyGrid() {
                                   placeholder={
                                     ce > 0 ? ce.toFixed(1) : "–"
                                   }
+                                  hasCommitted={ce > 0}
                                   onChange={(v) =>
                                     setEquipCell(
                                       assembly.wbs_code,
@@ -900,18 +949,30 @@ export function WeeklyGrid() {
                       className="text-center text-muted-foreground py-20"
                     >
                       <div className="space-y-3">
+                        <Settings className="h-10 w-10 text-muted-foreground/30 mx-auto" />
                         <p className="text-sm">
                           No production quantity codes added yet.
                         </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-1.5"
-                          onClick={() => setShowAddCodes(true)}
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                          Add Line
-                        </Button>
+                        <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                          Set up provisional codes first, or add a line directly.
+                        </p>
+                        <div className="flex items-center justify-center gap-3">
+                          <Button asChild variant="outline" size="sm" className="gap-1.5">
+                            <Link href="/setup">
+                              <Settings className="h-3.5 w-3.5" />
+                              Go to Setup
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            onClick={() => setShowAddCodes(true)}
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                            Add Line
+                          </Button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -1049,7 +1110,7 @@ export function WeeklyGrid() {
           className="hidden xl:block w-[280px] shrink-0 border-l overflow-y-auto p-4"
           style={{ borderColor: "var(--figma-bg-outline)" }}
         >
-          <MaterialDrawdown />
+          <MaterialDrawdown pendingDrawdowns={pendingDrawdowns} />
         </div>
       </div>
 

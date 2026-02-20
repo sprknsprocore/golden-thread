@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, ChevronDown, Search, Filter } from "lucide-react";
+import Link from "next/link";
+import { Download, ChevronDown, Search, Filter, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -27,6 +28,12 @@ export default function AnalysisPage() {
           <h1 className="text-xl font-semibold tracking-tight">Analysis</h1>
         </div>
         <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs h-8">
+            <Link href="/">
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Back to Budget
+            </Link>
+          </Button>
           <Tooltip>
             <TooltipTrigger asChild>
               <span>

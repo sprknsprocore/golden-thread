@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useMemo, Fragment } from "react";
+import Link from "next/link";
 import {
+  ArrowRight,
   ChevronDown,
   ChevronRight,
+  ClipboardList,
   CornerDownRight,
   Filter,
   Play,
@@ -350,12 +353,18 @@ export function WorkPackageBuilder() {
               <RotateCcw className="h-3.5 w-3.5" />Reset
             </Button>
             <Button
-              size="sm" className="gap-1.5 text-xs h-8"
-              style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}
+              variant="outline" size="sm" className="gap-1.5 text-xs h-8"
               onClick={() => { seedDemoScenario(); setExpandedWbs(new Set(["03-310.SDCR"])); }}
               disabled={hasSeededData}
             >
               <Plus className="h-3.5 w-3.5" />Seed Demo Data
+            </Button>
+            <Button asChild size="sm" className="gap-1.5 text-xs h-8" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
+              <Link href="/capture">
+                <ClipboardList className="h-3.5 w-3.5" />
+                Continue to Capture
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -429,9 +438,17 @@ export function WorkPackageBuilder() {
             <div className="flex flex-col items-center justify-center py-24 px-6">
               <Settings className="h-10 w-10 text-muted-foreground/30 mb-4" />
               <h3 className="text-base font-semibold mb-1">No work packages defined</h3>
-              <p className="text-sm text-muted-foreground text-center max-w-sm">
-                Click &ldquo;Seed Demo Data&rdquo; to load the Shallow Depth Concrete Repair assembly with 5 components and 3 days of production events.
+              <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
+                Define assemblies with components in Setup, or click &ldquo;Seed Demo Data&rdquo; to load a sample work package.
               </p>
+              <div className="flex items-center gap-3">
+                <Button asChild variant="outline" className="gap-1.5">
+                  <Link href="/setup">
+                    <Settings className="h-4 w-4" />
+                    Go to Setup
+                  </Link>
+                </Button>
+              </div>
             </div>
           ) : (
             <Table>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Filter, Search, X } from "lucide-react";
+import Link from "next/link";
+import { Filter, Search, X, ArrowRight, FlagTriangleRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReconciliationTable } from "@/components/reconciliation-table";
 import { useProductionStore } from "@/store/use-production-store";
@@ -11,7 +12,11 @@ type StatusFilter = "all" | "pending" | "flagged" | "reviewed";
 
 export default function ReconciliationPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
-  const { projectMetadata } = useProductionStore();
+  const { projectMetadata, provisionalCodes, trueUpStatuses } = useProductionStore();
+
+  const reviewedCount = Object.values(trueUpStatuses).filter((s) => s !== "pending").length;
+  const totalCodes = provisionalCodes.length;
+  const hasReviewed = reviewedCount > 0;
 
   return (
     <div className="flex flex-col h-full">
@@ -78,6 +83,24 @@ export default function ReconciliationPage() {
       <div className="flex-1 overflow-auto p-6">
         <ReconciliationTable statusFilter={filter} />
       </div>
+
+      {/* STICKY FOOTER — Continue to Closeout */}
+      {hasReviewed && (
+        <div className="shrink-0 bg-white border-t px-6 py-3 flex items-center justify-between" style={{ borderColor: "var(--figma-bg-outline)" }}>
+          <div className="flex items-center gap-2">
+            <FlagTriangleRight className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              {reviewedCount} of {totalCodes} code{totalCodes !== 1 ? "s" : ""} reviewed. Ready to finalize rates.
+            </p>
+          </div>
+          <Link href="/closeout">
+            <Button className="gap-1.5 h-8 text-xs" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
+              Continue to Closeout
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

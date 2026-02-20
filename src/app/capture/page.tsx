@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Users, PenLine, Search, Filter } from "lucide-react";
+import Link from "next/link";
+import { CalendarDays, Users, PenLine, Search, Filter, ArrowRight, GitCompareArrows } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DailyLog } from "@/components/daily-log";
 import { UnifiedGrid } from "@/components/unified-grid";
@@ -23,7 +24,9 @@ const modeDescriptions: Record<CaptureMode, string> = {
 
 export default function CapturePage() {
   const [mode, setMode] = useState<CaptureMode>("weekly");
-  const { projectMetadata } = useProductionStore();
+  const { projectMetadata, productionEvents } = useProductionStore();
+
+  const hasProductionData = productionEvents.length > 0;
 
   return (
     <div className="flex flex-col h-full">
@@ -90,6 +93,24 @@ export default function CapturePage() {
             </div>
           </div>
         </>
+      )}
+
+      {/* STICKY FOOTER — Continue to True-Up */}
+      {hasProductionData && (
+        <div className="shrink-0 bg-white border-t px-6 py-3 flex items-center justify-between" style={{ borderColor: "var(--figma-bg-outline)" }}>
+          <div className="flex items-center gap-2">
+            <GitCompareArrows className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              {productionEvents.length} production event{productionEvents.length !== 1 ? "s" : ""} logged. Ready for PM review.
+            </p>
+          </div>
+          <Link href="/reconciliation">
+            <Button className="gap-1.5 h-8 text-xs" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
+              Continue to True-Up
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       )}
     </div>
   );

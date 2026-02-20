@@ -42,6 +42,10 @@
       "materials": [
         { "item": "RCP Pipe 12\"", "qty_required": 580, "uom": "LF" },
         { "item": "Clean Stone Base", "qty_required": 189, "uom": "TON" }
+      ],
+      "equipment": [
+        { "name": "CAT 320 Excavator", "type": "Excavator" },
+        { "name": "Backhoe 430F", "type": "Backhoe" }
       ]
     },
     {
@@ -59,6 +63,11 @@
       ],
       "materials": [
         { "item": "RCP Pipe 30\"", "qty_required": 360, "uom": "LF" }
+      ],
+      "equipment": [
+        { "name": "CAT 330 Excavator", "type": "Excavator" },
+        { "name": "Backhoe 430F", "type": "Backhoe" },
+        { "name": "Hydraulic Breaker", "type": "Attachment" }
       ]
     },
     {

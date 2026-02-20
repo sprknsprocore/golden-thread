@@ -168,6 +168,14 @@ export default function BudgetPage() {
             </TooltipTrigger>
             <TooltipContent><p className="text-xs">Coming soon</p></TooltipContent>
           </Tooltip>
+          {assemblies.length > 0 && provisionalCodes.length === 0 && (
+            <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs h-8">
+              <Link href="/setup">
+                <Settings className="h-3.5 w-3.5" />
+                Get Started
+              </Link>
+            </Button>
+          )}
           <Button asChild size="sm" className="gap-1.5 text-xs h-8" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
             <Link href="/analysis">
               <BarChart3 className="h-3.5 w-3.5" />

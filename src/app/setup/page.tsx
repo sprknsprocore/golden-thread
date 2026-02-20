@@ -6,6 +6,7 @@ import {
   Users,
   Plus,
   ArrowRight,
+  Layers,
   PackagePlus,
   ListPlus,
   Inbox,
@@ -222,12 +223,20 @@ export default function SetupPage() {
             <p className="text-sm text-muted-foreground">
               {provisionalCodes.length} provisional code{provisionalCodes.length !== 1 ? "s" : ""} ready for field reporting.
             </p>
-            <Link href="/capture">
-              <Button className="gap-1.5 h-8 text-xs" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
-                Continue to Capture
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/work-package">
+                <Button variant="outline" className="gap-1.5 h-8 text-xs">
+                  <Layers className="h-3.5 w-3.5" />
+                  View Work Packages
+                </Button>
+              </Link>
+              <Link href="/capture">
+                <Button className="gap-1.5 h-8 text-xs" style={{ backgroundColor: "var(--figma-cta-p1-bg)", color: "var(--figma-cta-p1-text)" }}>
+                  Continue to Capture
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       )}

@@ -42,6 +42,11 @@ export interface WorkPackageComponent {
   qty_installed: number;
 }
 
+export interface EquipmentItem {
+  name: string;
+  type: string;
+}
+
 export interface Assembly {
   wbs_code: string;
   description: string;
@@ -52,6 +57,7 @@ export interface Assembly {
   blended_unit_cost: number;
   crew_template: CrewTemplateMember[];
   materials: MaterialRequirement[];
+  equipment?: EquipmentItem[];
   components?: WorkPackageComponent[];
 }
 
